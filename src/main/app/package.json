@@ -1,0 +1,27 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-scripts": "1.0.13"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "proxy": {
+    "/signin": {
+      "target": "http://localhost:8080"
+    },
+    "/signout": {
+      "target": "http://localhost:8080"
+    },
+    "/api": {
+      "target": "http://localhost:8080"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.Welcome-banner {
+    text-align: center;
+}
+
+.Welcome-banner > h1 {
+    font-size: 5vw;
+}
+
+.Welcome-banner > img {
+    max-width: 100vw;
+}
