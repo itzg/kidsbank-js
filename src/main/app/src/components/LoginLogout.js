@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
+import {Button, Icon} from 'semantic-ui-react';
 
 class LoginLogout extends Component {
   constructor(props) {
     super(props);
-
-    this.handleLogout = this.handleLogout.bind(this);
   }
 
   render() {
@@ -19,23 +18,29 @@ class LoginLogout extends Component {
         <div>
           <div>Logged in as {currentUser.connection ? currentUser.connection.displayName : currentUser.name}</div>
           <div>
-            <button onClick={this.handleLogout}>Logout</button>
+            <Button content="Logout" onClick={this.handleLogout}>Logout</Button>
           </div>
         </div>
       );
     } else {
       return (
         <div>
-          <a href="/signin/facebook">Log in with Facebook</a>
+          <Button color='facebook' onClick={this.handleLogin}>
+            <Icon name='facebook'/> Log in with Facebook
+          </Button>
         </div>
       )
     }
   }
 
-  handleLogout() {
+  handleLogin = () => {
+    window.location = '/signin/facebook';
+  };
+
+  handleLogout = () => {
     fetch('/signout', {method: 'POST', credentials: 'same-origin'}).then((resp) => {
       if (resp.ok) {
-        window.location.reload();
+        window.location = '/';
       }
     });
   }
