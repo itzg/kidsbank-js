@@ -3,9 +3,9 @@ import {Loader} from 'semantic-ui-react';
 import './welcome.css';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router-dom'
-import logo from './kidsbank-main.png';
 import Login from './Login';
 import {fetchUserProfile} from '../../actions/user';
+import KidsbankLogo from '../../components/KidsbankLogo';
 
 class Welcome extends Component {
   render() {
@@ -25,7 +25,7 @@ class Welcome extends Component {
       <div>
         <div className="Welcome-banner">
           <h1>Welcome to</h1>
-          <img src={logo} alt="kidsbank"/>
+          <KidsbankLogo autosize={true} centered={true}/>
         </div>
         {loginBit}
       </div>

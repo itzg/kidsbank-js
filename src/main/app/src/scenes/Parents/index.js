@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {fetchUserProfile} from '../../actions/user';
-import {Loader} from 'semantic-ui-react';
-import {Redirect} from 'react-router-dom';
+import {fetchUserProfile, logoutUser} from '../../actions/user';
+import {Dropdown, Image, Loader, Menu} from 'semantic-ui-react';
+import {Link, Redirect} from 'react-router-dom';
+import KidsbankLogo from '../../components/KidsbankLogo'
 
 class Parents extends Component {
   constructor(props) {
@@ -21,17 +22,37 @@ class Parents extends Component {
       return <Redirect to="/"/>
     }
     else {
-      return (<div>Hi {this.props.profile.displayName}</div>)
+      const profileHeader = (
+        <div>
+          <Image src={this.props.profile.profileImageUrl} avatar/>
+          {this.props.profile.displayName}
+        </div>
+      );
+
+      return (
+        <div>
+          <Menu attached='top'>
+            <Menu.Item as={Link} to="/parent" header><KidsbankLogo small={true}/></Menu.Item>
+            <Menu.Menu position='right'>
+              <Dropdown item trigger={profileHeader}>
+                <Dropdown.Menu>
+                  <Dropdown.Item text="Logout" onClick={() => this.props.onLogout()}/>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Menu.Menu>
+          </Menu>
+        </div>
+      )
     }
 
   }
 
   componentDidMount() {
-    this.props.dispatch(fetchUserProfile())
+    this.props.fetchUserProfile();
   }
 }
 
-function mapStateToProps(state) {
+const mapStateToProps = (state) => {
 
   const {user} = state;
 
@@ -41,6 +62,17 @@ function mapStateToProps(state) {
     loggedIn: user.loggedIn,
     role: user.role
   }
-}
+};
 
-export default connect(mapStateToProps)(Parents);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onLogout: () => {
+      dispatch(logoutUser());
+    },
+    fetchUserProfile: () => {
+      dispatch(fetchUserProfile());
+    }
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Parents);
