@@ -1,6 +1,7 @@
 package me.itzg.kidsbank.config;
 
-import me.itzg.kidsbank.users.Roles;
+import me.itzg.kidsbank.users.Authorities;
+import me.itzg.kidsbank.web.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,8 @@ import org.springframework.social.security.SocialAuthenticationFilter;
 import org.springframework.social.security.SocialAuthenticationProvider;
 import org.springframework.social.security.SocialAuthenticationServiceLocator;
 import org.springframework.social.security.SocialUserDetailsService;
+
+import static java.lang.String.format;
 
 /**
  * @author Geoff Bourne
@@ -35,7 +38,7 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public WebConfig(UserIdSource userIdSource,
                      UsersConnectionRepository usersConnectionRepository,
-                     @SuppressWarnings("SpringJavaAutowiringInspection")
+                     @SuppressWarnings({"SpringJavaAutowiringInspection", "SpringJavaInjectionPointsAutowiringInspection"})
                              SocialAuthenticationServiceLocator socialAuthenticationServiceLocator,
                      SocialUserDetailsService userAccountService) {
         this.userIdSource = userIdSource;
@@ -44,10 +47,11 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
         this.userAccountService = userAccountService;
     }
 
+    @SuppressWarnings("RedundantThrows")
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers("/")
+                .antMatchers(Paths.ROOT)
                 .antMatchers("/index.html")
                 .antMatchers("/js/**");
     }
@@ -57,18 +61,19 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/parents/**").hasAuthority(Roles.PARENT)
-                .antMatchers("/api/kids/**").hasAuthority(Roles.KID)
-                .antMatchers("/api/currentUser").permitAll()
-                .antMatchers("/signin/**").permitAll()
+                .antMatchers(format("%s/**", Paths.API_PARENT)).hasAuthority(Authorities.PARENT)
+                .antMatchers(format("%s/**", Paths.API_KID)).hasAuthority(Authorities.KID)
+                .antMatchers(format("%s/%s", Paths.API, Paths.CURRENT_USER)).permitAll()
+                .antMatchers(format("%s/**", Paths.SIGNIN)).permitAll()
                 .antMatchers("/connect/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(socialAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class)
-                .logout().deleteCookies("JSESSIONID").logoutUrl("/signout").logoutSuccessUrl("/")
+                .logout().deleteCookies("JSESSIONID").logoutUrl(Paths.SIGNOUT).logoutSuccessUrl(Paths.ROOT)
         ;
     }
 
+    @SuppressWarnings("RedundantThrows")
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(socialAuthenticationProvider());
@@ -85,10 +90,10 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
         SocialAuthenticationFilter filter = new SocialAuthenticationFilter(
                 authenticationManager(), userIdSource,
                 usersConnectionRepository, socialAuthenticationServiceLocator);
-        filter.setFilterProcessesUrl("/signin");
+        filter.setFilterProcessesUrl(Paths.SIGNIN);
         filter.setSignupUrl(null);
-        filter.setConnectionAddedRedirectUrl("/#/myAccount");
-        filter.setPostLoginUrl("/#/myAccount"); //always open account profile page after login
+        filter.setConnectionAddedRedirectUrl(Paths.PARENT);
+        filter.setPostLoginUrl(Paths.PARENT);
 //        filter.setRememberMeServices(rememberMeServices());
         return filter;
     }

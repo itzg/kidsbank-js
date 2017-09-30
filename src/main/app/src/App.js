@@ -1,42 +1,23 @@
 import React, {Component} from 'react';
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import './App.css';
-import LoginLogout from './components/LoginLogout';
 import Welcome from './scenes/Welcome';
+import Parents from './scenes/Parents';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      currentUser: null,
-      loading: true
-    };
-  }
 
   render() {
-    return (
-      <div className="App">
-        <Welcome/>
-        <LoginLogout currentUser={this.state.currentUser} loading={this.state.loading}/>
-      </div>
-    );
-  }
 
-  componentDidMount() {
-    fetch('/api/currentUser', {credentials: 'same-origin'}).then((resp) => {
-      if (resp.ok) {
-        if (resp.status === 200) {
-          resp.json().then((data) => {
-            console.log('currentUser is', data);
-            this.setState({currentUser: data, loading: false});
-          });
-        }
-        else {
-          console.log('currentUser is not yet available');
-          this.setState({loading: false})
-        }
-      }
-    })
+    return (
+      <Router>
+        <div className="App">
+          <Switch>
+            <Route path="/parent" component={Parents}/>
+            <Route component={Welcome}/>
+          </Switch>
+        </div>
+      </Router>
+    );
   }
 }
 

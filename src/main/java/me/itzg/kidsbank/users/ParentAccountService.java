@@ -36,8 +36,7 @@ public class ParentAccountService implements SocialUserDetailsService {
             throw new UsernameNotFoundException(userId);
         }
 
-        final SocialUser user = new SocialUser(userId, "N/A", Collections.singletonList(Roles.PARENT_AUTHORITY));
-        return user;
+        return new SocialUser(userId, "N/A", Collections.singletonList(Authorities.PARENT_AUTHORITY));
     }
 
     public String autoCreateUser(SocialConnection socialConnection) {

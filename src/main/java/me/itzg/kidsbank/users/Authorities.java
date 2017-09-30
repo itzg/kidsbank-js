@@ -7,7 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  * @author Geoff Bourne
  * @since Sep 2017
  */
-public class Roles {
+public class Authorities {
     public static final String PARENT = "ROLE_PARENT";
     public static final GrantedAuthority PARENT_AUTHORITY = new SimpleGrantedAuthority(PARENT);
 
