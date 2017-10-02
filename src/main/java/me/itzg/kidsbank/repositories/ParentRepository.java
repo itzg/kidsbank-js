@@ -1,6 +1,6 @@
 package me.itzg.kidsbank.repositories;
 
-import me.itzg.kidsbank.domain.Parent;
+import me.itzg.kidsbank.types.Parent;
 import org.springframework.data.repository.CrudRepository;
 
 /**

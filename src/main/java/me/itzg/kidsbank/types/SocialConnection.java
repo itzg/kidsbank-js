@@ -1,4 +1,4 @@
-package me.itzg.kidsbank.domain;
+package me.itzg.kidsbank.types;
 
 import lombok.Data;
 

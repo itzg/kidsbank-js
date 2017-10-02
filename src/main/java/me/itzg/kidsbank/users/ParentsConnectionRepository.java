@@ -1,8 +1,7 @@
 package me.itzg.kidsbank.users;
 
 import lombok.extern.slf4j.Slf4j;
-import me.itzg.kidsbank.domain.Parent;
-import org.springframework.beans.factory.annotation.Autowired;
+import me.itzg.kidsbank.types.Parent;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.social.connect.Connection;
@@ -31,7 +30,6 @@ public class ParentsConnectionRepository implements UsersConnectionRepository {
     private final ConnectionFactoryLocator connectionFactoryLocator;
     private ConnectionSignUp connectionSignUp;
 
-    @Autowired
     public ParentsConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator, MongoTemplate mongoTemplate) {
         this.connectionFactoryLocator = connectionFactoryLocator;
         this.mongoTemplate = mongoTemplate;

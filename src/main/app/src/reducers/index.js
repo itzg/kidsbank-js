@@ -1,36 +1,12 @@
-import {RECEIVE_USER_PROFILE, REQUEST_USER_PROFILE} from "../actions/user";
-
-import _ from 'lodash';
-import {combineReducers} from "redux";
-
-function user(state = {
-                isFetching: true,
-                role: null,
-                profile: null,
-                loggedIn: false
-              },
-              action) {
-  switch (action.type) {
-    case REQUEST_USER_PROFILE:
-      return Object.assign({}, state, {
-        isFetching: true
-      });
-
-    case RECEIVE_USER_PROFILE:
-      return Object.assign({}, state, {
-        isFetching: false,
-        profile: action.profile,
-        loggedIn: action.profile && !_.isEmpty(action.profile.role),
-        role: action.profile && _.toLower(action.profile.role)
-      });
-
-    default:
-      return state;
-  }
-}
+import {combineReducers} from 'redux';
+import user from './user';
+import accounts from './accounts';
+import {reducer as formReducer} from 'redux-form';
 
 const rootReducer = combineReducers({
-  user
+  user,
+  accounts,
+  form: formReducer
 });
 
 export default rootReducer;

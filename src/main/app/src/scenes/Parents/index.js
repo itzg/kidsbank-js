@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {fetchUserProfile, logoutUser} from '../../actions/user';
 import {Dropdown, Image, Loader, Menu} from 'semantic-ui-react';
-import {Link, Redirect} from 'react-router-dom';
+import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import KidsbankLogo from '../../components/KidsbankLogo'
+import Accounts from "./Accounts";
 
 class Parents extends Component {
   constructor(props) {
@@ -29,10 +30,20 @@ class Parents extends Component {
         </div>
       );
 
+      const accountsTab = (
+        <Switch>
+          <Route exact path="/parent" render={() =>
+            <Menu.Item as={Link} to="/parent" header active={true}>Accounts</Menu.Item>
+          }/>
+        </Switch>
+
+      );
+
       return (
-        <div>
-          <Menu attached='top'>
+        <div className="Parents">
+          <Menu attached='top' pointing>
             <Menu.Item as={Link} to="/parent" header><KidsbankLogo small={true}/></Menu.Item>
+            {accountsTab}
             <Menu.Menu position='right'>
               <Dropdown item trigger={profileHeader}>
                 <Dropdown.Menu>
@@ -41,6 +52,10 @@ class Parents extends Component {
               </Dropdown>
             </Menu.Menu>
           </Menu>
+
+          <Switch>
+            <Route exact path={this.props.match.url} component={Accounts}/>
+          </Switch>
         </div>
       )
     }

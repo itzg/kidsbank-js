@@ -1,9 +1,9 @@
 package me.itzg.kidsbank.users;
 
 import lombok.extern.slf4j.Slf4j;
-import me.itzg.kidsbank.domain.Parent;
-import me.itzg.kidsbank.domain.SocialConnection;
 import me.itzg.kidsbank.repositories.ParentRepository;
+import me.itzg.kidsbank.types.Parent;
+import me.itzg.kidsbank.types.SocialConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.social.security.SocialUser;

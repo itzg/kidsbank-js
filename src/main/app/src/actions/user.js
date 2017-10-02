@@ -1,3 +1,5 @@
+import {get} from './RestApi';
+
 export const REQUEST_USER_PROFILE = 'FETCH_USER_PROFILE_REQUEST';
 
 export function requestUserProfile() {
@@ -7,7 +9,7 @@ export function requestUserProfile() {
 }
 
 export function fetchUserProfile() {
-  return function (dispatch, getState) {
+  return (dispatch, getState) => {
 
     if (getState().user.loggedIn) {
       return;
@@ -15,7 +17,7 @@ export function fetchUserProfile() {
 
     dispatch(requestUserProfile());
 
-    return fetch('/api/currentUser', {credentials: 'same-origin'}).then((resp) => {
+    return get('/api/currentUser').then((resp) => {
       if (resp.ok) {
         if (resp.status === 200) {
           resp.json().then((data) => {

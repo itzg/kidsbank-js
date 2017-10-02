@@ -1,7 +1,7 @@
 package me.itzg.kidsbank.users;
 
 import lombok.extern.slf4j.Slf4j;
-import me.itzg.kidsbank.domain.SocialConnection;
+import me.itzg.kidsbank.types.SocialConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionSignUp;

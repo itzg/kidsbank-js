@@ -11,6 +11,7 @@
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.13",
     "redux": "^3.7.2",
+    "redux-form": "^7.0.4",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "semantic-ui-css": "^2.2.12",

@@ -1,10 +1,8 @@
-package me.itzg.kidsbank.domain;
+package me.itzg.kidsbank.types;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
 
 /**
  * @author Geoff Bourne
@@ -12,10 +10,10 @@ import java.util.List;
  */
 @Document
 @Data
-public class Parent {
+public class Account {
+
     @Id
     String id;
 
-    List<SocialConnection> socialConnections;
-
+    String name;
 }

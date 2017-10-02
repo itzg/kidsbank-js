@@ -1,5 +1,6 @@
-package me.itzg.kidsbank.domain;
+package me.itzg.kidsbank.types;
 
+import me.itzg.kidsbank.config.KidsbankProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -7,6 +8,7 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Geoff Bourne
@@ -16,10 +18,12 @@ import javax.annotation.PostConstruct;
 public class MongoIndexes {
 
     private final MongoTemplate mongoTemplate;
+    private final KidsbankProperties properties;
 
     @Autowired
-    public MongoIndexes(MongoTemplate mongoTemplate) {
+    public MongoIndexes(MongoTemplate mongoTemplate, KidsbankProperties kidsbankProperties) {
         this.mongoTemplate = mongoTemplate;
+        this.properties = kidsbankProperties;
     }
 
     @PostConstruct
@@ -28,5 +32,10 @@ public class MongoIndexes {
                 .ensureIndex(new Index()
                                      .on("socialConnections.provider", Sort.Direction.ASC)
                                      .on("socialConnections.user", Sort.Direction.ASC));
+
+        mongoTemplate.indexOps(Kidlink.class)
+                .ensureIndex(new Index()
+                                     .on("created", Sort.Direction.ASC)
+                                     .expire(properties.getKidlinkExpiration(), TimeUnit.SECONDS));
     }
 }
