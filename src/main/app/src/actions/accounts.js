@@ -1,4 +1,5 @@
 import {getJson, postJson} from './RestApi';
+import {adaptValidationToSubmissionError} from "./Forms";
 
 export const FETCH_ACCOUNTS_START = 'FETCH_ACCOUNTS_START';
 
@@ -56,12 +57,11 @@ export function createAccount(fields) {
     return postJson('/api/parent/accounts', fields)
       .then(json => {
 
-        return dispatch(createAccountSuccess(json));
+          return dispatch(createAccountSuccess(json));
 
-      }, err => {
-        console.error('failed', err);
-        return Promise.reject(err);
-      })
+        },
+        adaptValidationToSubmissionError
+      )
   }
 }
 

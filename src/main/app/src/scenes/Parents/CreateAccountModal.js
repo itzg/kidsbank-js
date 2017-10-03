@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Button, Form, Modal} from 'semantic-ui-react';
+import {Button, Form, Input, Modal} from 'semantic-ui-react';
 import {Field, reduxForm} from 'redux-form';
+import ValidatedFormField from "../../components/ValidatedFormField";
 
 class CreateAccountModal extends Component {
   constructor(props) {
@@ -9,9 +10,10 @@ class CreateAccountModal extends Component {
 
   render() {
 
+    // handleSubmit is injected by reduxForm
     const form = (
       <Form onSubmit={this.props.handleSubmit}>
-        <Field component={Form.Input} name='name' required label='Account/Child Name'/>
+        <Field name='name' component={ValidatedFormField} control={Input} required label='Account/Child Name'/>
       </Form>
     );
 
@@ -26,7 +28,7 @@ class CreateAccountModal extends Component {
         </Modal.Content>
         <Modal.Actions>
           <Button onClick={this.handleCancel}>Cancel</Button>
-          <Button positive onClick={this.handleCreate}>Create</Button>
+          <Button positive onClick={this.props.handleSubmit}>Create</Button>
         </Modal.Actions>
       </Modal>
     )
@@ -35,11 +37,6 @@ class CreateAccountModal extends Component {
 
   handleCancel = () => {
     this.props.onDone();
-  };
-
-  handleCreate = () => {
-    this.props.handleSubmit()
-      .then(() => this.props.onDone());
   };
 
 }

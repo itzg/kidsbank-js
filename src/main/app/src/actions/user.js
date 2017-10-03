@@ -43,11 +43,27 @@ export function receiveUserProfile(profile) {
   }
 }
 
-export const LOGIN_USER = 'LOGIN_USER';
+export const LOGIN_PARENT = 'LOGIN_PARENT';
 
-export function loginUser() {
+export function loginParent() {
   return () => {
     window.location = '/signin/facebook';
+  }
+}
+
+export const LOGIN_KID = 'LOGIN_KID';
+
+export function loginKid(username, password) {
+  return (dispatch) => {
+    //TODO
+  }
+}
+
+export const REGISTER_KID = 'REGISTER_KID';
+
+export function registerKid(username, password, kidlinkCode) {
+  return (dispatch) => {
+    //TODO
   }
 }
 

@@ -85,7 +85,12 @@ class Accounts extends Component {
       });
   };
 
-  handleCreateSubmit = submitForm(createAccount)
+  handleCreateSubmit = (values) => {
+    return this.props.handleCreateAccount(values)
+      .then(() => {
+        this.handleCreateDone();
+      })
+  }
 }
 
 const mapStateToProps = (state) => {
@@ -105,6 +110,10 @@ const mapDispatchToProps = (dispatch) => {
 
     handleShare: (account) => {
       return dispatch(shareAccount(account));
+    },
+
+    handleCreateAccount: (fields) => {
+      return dispatch(createAccount(fields));
     }
   }
 };

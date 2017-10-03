@@ -1,0 +1,10 @@
+.TypeChooser.Container {
+    margin: 0 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.TypeChooser.Item {
+    flex: 0 1 20em;
+}
