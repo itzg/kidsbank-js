@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 /**
@@ -25,4 +26,8 @@ public class KidsbankProperties {
      */
     @Min(1)
     int kidlinkDigits = 4;
+
+    @Min(4)
+    @Max(31)
+    int passwordBcryptStrength = 10;
 }

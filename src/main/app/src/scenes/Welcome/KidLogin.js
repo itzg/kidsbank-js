@@ -1,5 +1,10 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+
+import {loginKid, registerKid} from '../../actions/user';
+import KidRegisterForm from "./KidRegisterForm";
+import KidLoginForm from "./KidLoginForm";
+import './KidLogin.css'
 
 class KidLogin extends Component {
   constructor(props) {
@@ -11,13 +16,49 @@ class KidLogin extends Component {
   }
 
   render() {
-    return <div>Hi</div>
+    return this.state.needsToRegister ? (
+      <KidRegisterForm onSubmit={this.props.onRegister}
+                       onSwitchToLogin={this.handleSwitchToLogin}
+                       className='KidLogin'
+      />
+    ) : (
+      <KidLoginForm onSubmit={this.props.onLogin}
+                    onSwitchToRegister={this.handleSwitchToRegister}
+                    className='KidLogin'
+      />
+    );
   }
 
-  static propTypes = {
-    onLogin: PropTypes.func.required,
-    onRegister: PropTypes.func.required
-  }
+  handleSwitchToRegister = () => {
+    this.setState({needsToRegister: true});
+  };
+
+  handleSwitchToLogin = () => {
+    this.setState({needsToRegister: false});
+  };
 }
 
-export default KidLogin;
+const mapStateToProps = (state) => {
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onLogin: (values) => {
+      const {
+        username,
+        password
+      } = values;
+      return dispatch(loginKid(username, password));
+    },
+
+    onRegister: (values) => {
+      const {
+        username,
+        password,
+        kidlinkCode
+      } = values;
+      return dispatch(registerKid(username, password, kidlinkCode));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(KidLogin);

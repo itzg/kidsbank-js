@@ -37,13 +37,13 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(SpringRunner.class)
 @DataMongoTest
-public class KidlinkServiceTest {
+public class KidlinkServiceImplTest {
 
     private Parent parent;
     private Account account;
 
     @TestConfiguration
-    @Import({KidlinkService.class, MongoIndexes.class})
+    @Import({KidlinkServiceImpl.class, MongoIndexes.class})
     public static class Config {
         @Bean
         public KidsbankProperties kidsbankProperties() {

@@ -1,16 +1,21 @@
 package me.itzg.kidsbank.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.itzg.kidsbank.users.Authorities;
+import me.itzg.kidsbank.users.KidAuthenticationProvider;
+import me.itzg.kidsbank.users.KidLoginAuthFilter;
+import me.itzg.kidsbank.users.KidRegisterAuthFilter;
 import me.itzg.kidsbank.web.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.social.UserIdSource;
 import org.springframework.social.connect.UsersConnectionRepository;
@@ -30,6 +35,8 @@ import static java.lang.String.format;
 public class WebConfig extends WebSecurityConfigurerAdapter {
 
     private final SocialUserDetailsService userAccountService;
+    private final ObjectMapper objectMapper;
+    private final KidAuthenticationProvider kidAuthenticationProvider;
 
     private final UserIdSource userIdSource;
 
@@ -42,11 +49,15 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
                      UsersConnectionRepository usersConnectionRepository,
                      @SuppressWarnings({"SpringJavaAutowiringInspection", "SpringJavaInjectionPointsAutowiringInspection"})
                              SocialAuthenticationServiceLocator socialAuthenticationServiceLocator,
-                     SocialUserDetailsService userAccountService) {
+                     SocialUserDetailsService userAccountService,
+                     ObjectMapper objectMapper,
+                     KidAuthenticationProvider kidAuthenticationProvider) {
         this.userIdSource = userIdSource;
         this.usersConnectionRepository = usersConnectionRepository;
         this.socialAuthenticationServiceLocator = socialAuthenticationServiceLocator;
         this.userAccountService = userAccountService;
+        this.objectMapper = objectMapper;
+        this.kidAuthenticationProvider = kidAuthenticationProvider;
     }
 
     @SuppressWarnings("RedundantThrows")
@@ -71,20 +82,34 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(socialAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+                .addFilterBefore(kidRegistrationFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+                .addFilterBefore(kidLoginFilter(), AbstractPreAuthenticatedProcessingFilter.class)
                 .logout().deleteCookies("JSESSIONID").logoutUrl(Paths.SIGNOUT).logoutSuccessUrl(Paths.ROOT)
         ;
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    private KidLoginAuthFilter kidLoginFilter() throws Exception {
+        final KidLoginAuthFilter filter = new KidLoginAuthFilter(Paths.KID_LOGIN, objectMapper);
+        filter.setAuthenticationManager(authenticationManager());
+        return filter;
+    }
+
+    private KidRegisterAuthFilter kidRegistrationFilter() throws Exception {
+        final KidRegisterAuthFilter filter = new KidRegisterAuthFilter(Paths.KID_REGISTER, objectMapper);
+        filter.setAuthenticationManager(authenticationManager());
+        return filter;
     }
 
     @SuppressWarnings("RedundantThrows")
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(socialAuthenticationProvider());
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+        auth.authenticationProvider(kidAuthenticationProvider);
     }
 
     @Bean

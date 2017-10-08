@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button, Divider, Segment} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {loginKid, loginParent, registerKid} from "../../actions/user";
+import {loginParent} from "../../actions/user";
 import ParentLogin from './ParentLogin'
 import KidLogin from "./KidLogin";
 import './Login.css';
@@ -29,23 +29,28 @@ class Login extends Component {
         break;
 
       case LOGIN_TYPE_KID:
-        inner = <KidLogin onLogin={this.props.handleKidLogin} onRegister={this.props.handleKidRegister}/>;
+        inner = <KidLogin/>;
         break;
 
       default:
-        inner = <Segment padded>
+        inner =
+          <div>
 
-          <Button size='huge' fluid onClick={this.chooseParentLogin}>I'm a parent</Button>
-          <Divider horizontal>or</Divider>
-          <Button size='huge' fluid onClick={this.chooseKidLogin}>I'm a kid</Button>
-
-        </Segment>;
+            <Button size='huge' fluid onClick={this.chooseParentLogin}>I'm a parent</Button>
+            <Divider horizontal>or</Divider>
+            <Button size='huge' fluid onClick={this.chooseKidLogin}>I'm a kid</Button>
+          </div>
+        ;
     }
 
     return (
       <div className='TypeChooser Container'>
         <div className='TypeChooser Item'>
-          {inner}
+          <Segment padded attached>
+            {inner}
+          </Segment>
+          {this.state.loginType &&
+          <Button size='mini' attached='bottom' onClick={this.unchooseType}>Go back</Button>}
         </div>
       </div>
     )
@@ -57,7 +62,11 @@ class Login extends Component {
   };
 
   chooseKidLogin = () => {
-    this.setState({loginType: LOGIN_TYPE_KID})
+    this.setState({loginType: LOGIN_TYPE_KID});
+  }
+
+  unchooseType = () => {
+    this.setState({loginType: null});
   }
 }
 
@@ -69,15 +78,8 @@ const mapDispatchToProps = dispatch => {
   return {
     handleParentLogin: () => {
       dispatch(loginParent());
-    },
-
-    handleKidLogin: (username, password) => {
-      dispatch(loginKid(username, password));
-    },
-
-    handleKidRegister: (username, password, kidlinkCode) => {
-      dispatch(registerKid(username, password, kidlinkCode));
     }
+
   }
 };
 

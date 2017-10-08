@@ -13,4 +13,6 @@ public class Paths {
     public static final String CURRENT_USER = "currentUser";
     public static final String API_PARENT = "/api/parent";
     public static final String API_KID = "/api/kid";
+    public static final String KID_REGISTER = "/kid-register";
+    public static final String KID_LOGIN = "/kid-login";
 }

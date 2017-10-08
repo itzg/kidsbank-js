@@ -35,7 +35,7 @@ export function get(path) {
  * @param path
  * @param body
  * @returns {Promise<Object>} a promise resolved with the JSON content of the response or rejected
- * with a Spring Boot error response.
+ * with the original response object.
  */
 export function postJson(path, obj) {
   const body = JSON.stringify(obj);
@@ -51,9 +51,7 @@ export function postJson(path, obj) {
   }).then(
     (response) => {
       if (!response.ok) {
-        return response.json().then(content => {
-          return Promise.reject(content);
-        })
+        return Promise.reject(response);
       }
       else {
         return response.json();

@@ -1,4 +1,5 @@
-import {get} from './RestApi';
+import {get, postJson} from './RestApi';
+import {SubmissionError} from 'redux-form';
 
 export const REQUEST_USER_PROFILE = 'FETCH_USER_PROFILE_REQUEST';
 
@@ -51,11 +52,40 @@ export function loginParent() {
   }
 }
 
+const handleLoginOrRegisterFailed = (response) => {
+  if (response.status === 403) {
+    const detail = {};
+
+    let reason = response.headers.get('X-Reason');
+    let field = response.headers.get('X-Reason-Field');
+    if (field) {
+      detail[field] = reason;
+    } else {
+      detail._error = reason;
+    }
+
+    return Promise.reject(new SubmissionError(detail));
+  }
+  else {
+    return Promise.reject(response);
+  }
+};
+
 export const LOGIN_KID = 'LOGIN_KID';
 
 export function loginKid(username, password) {
   return (dispatch) => {
-    //TODO
+    return postJson('/kid-login', {
+      username,
+      password
+    })
+      .then(
+        (json) => {
+          dispatch(fetchUserProfile());
+          return Promise.resolve();
+        },
+        handleLoginOrRegisterFailed
+      )
   }
 }
 
@@ -63,7 +93,18 @@ export const REGISTER_KID = 'REGISTER_KID';
 
 export function registerKid(username, password, kidlinkCode) {
   return (dispatch) => {
-    //TODO
+    return postJson('/kid-register', {
+      username,
+      password,
+      kidlinkCode
+    })
+      .then(
+        () => {
+          dispatch(fetchUserProfile());
+          return Promise.resolve();
+        },
+        handleLoginOrRegisterFailed
+      )
   }
 }
 

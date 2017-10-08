@@ -1,14 +1,19 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Icon} from 'semantic-ui-react';
+import {Button, Header, Icon} from 'semantic-ui-react';
 
 class ParentLogin extends Component {
 
   render() {
     return (
-      <Button color='facebook' onClick={this.props.onLogin}>
-        <Icon name='facebook'/> Log in with Facebook
-      </Button>
+      <div className='ParentLogin'>
+        <Header>Login with your social account
+          <Header.Subheader>Avoid keeping track of yet another password</Header.Subheader>
+        </Header>
+        <Button color='facebook' onClick={this.props.onLogin}>
+          <Icon name='facebook'/> Log in with Facebook
+        </Button>
+      </div>
     );
   }
 

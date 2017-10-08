@@ -12,4 +12,5 @@ public class Authorities {
     public static final GrantedAuthority PARENT_AUTHORITY = new SimpleGrantedAuthority(PARENT);
 
     public static final String KID = "ROLE_KID";
+    public static final GrantedAuthority KID_AUTHORITY = new SimpleGrantedAuthority(KID);
 }
