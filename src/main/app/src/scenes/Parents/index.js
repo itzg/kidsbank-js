@@ -4,7 +4,9 @@ import {fetchUserProfile, logoutUser} from '../../actions/user';
 import {Dropdown, Image, Loader, Menu} from 'semantic-ui-react';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import KidsbankLogo from '../../components/KidsbankLogo'
-import Accounts from "./Accounts";
+import Accounts from './Accounts';
+import AccountDetail from './AccountDetail';
+import AccountSpecificTab from './AccountSpecificTab';
 
 class Parents extends Component {
   constructor(props) {
@@ -13,7 +15,7 @@ class Parents extends Component {
 
   render() {
     if (this.props.isFetchingUser) {
-      return <Loader/>
+      return <Loader active inline/>
     }
     else if (!this.props.loggedIn) {
       return <Redirect to="/"/>
@@ -30,19 +32,18 @@ class Parents extends Component {
         </div>
       );
 
-      const accountsTab = (
-        <Switch>
-          <Route exact path="/parent" render={() =>
-            <Menu.Item as={Link} to="/parent" header active={true}>Accounts</Menu.Item>
-          }/>
-        </Switch>
+      const accountsTab = [
+        <Route key='top' path="/parent" render={(props) =>
+          <Menu.Item as={Link} to="/parent" active={props.match.isExact}>Accounts</Menu.Item>
+        }/>,
+        <Route key='detail' path="/parent/account/:accountId" component={AccountSpecificTab}/>
+      ];
 
-      );
 
       return (
         <div className="Parents">
           <Menu attached='top' pointing>
-            <Menu.Item as={Link} to="/parent" header><KidsbankLogo small={true}/></Menu.Item>
+            <Menu.Item as={Link} to="/parent" header><KidsbankLogo size='small'/></Menu.Item>
             {accountsTab}
             <Menu.Menu position='right'>
               <Dropdown item trigger={profileHeader}>
@@ -55,6 +56,7 @@ class Parents extends Component {
 
           <Switch>
             <Route exact path={this.props.match.url} component={Accounts}/>
+            <Route exact path={`${this.props.match.url}/account/:accountId`} component={AccountDetail}/>
           </Switch>
         </div>
       )
@@ -69,13 +71,14 @@ class Parents extends Component {
 
 const mapStateToProps = (state) => {
 
-  const {user} = state;
+  const {user, accounts} = state;
 
   return {
     isFetchingUser: user.isFetching,
     profile: user.profile,
     loggedIn: user.loggedIn,
-    role: user.role
+    role: user.role,
+    accountsById: accounts.byId
   }
 };
 

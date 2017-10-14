@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button, Form, Input, Modal} from 'semantic-ui-react';
 import {Field, reduxForm} from 'redux-form';
-import ValidatedFormField from "../../components/ValidatedFormField";
+import ValidatedFormField from "../../../components/ValidatedFormField";
 
 class CreateAccountModal extends Component {
   constructor(props) {

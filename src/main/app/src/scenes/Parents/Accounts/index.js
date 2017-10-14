@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import './Accounts.css';
-import {Button, Card, Loader, Message} from 'semantic-ui-react';
+import {Button, Loader} from 'semantic-ui-react';
 import CreateAccountModal from "./CreateAccountModal";
-import {createAccount, fetchParentManagedAccounts, shareAccount} from '../../actions/accounts';
-import {submitForm} from "../../actions/Forms";
+import {createAccount, fetchParentManagedAccounts, shareAccount} from '../../../actions/accounts';
+import {submitForm} from '../../../actions/Forms';
+import Account from './Account';
+import './index.css';
 
 class Accounts extends Component {
   constructor(props) {
@@ -20,7 +21,7 @@ class Accounts extends Component {
     let listArea;
 
     if (this.props.isFetching) {
-      listArea = <Loader/>
+      listArea = <Loader active inline/>
     }
 
     if (this.props.accounts.length === 0) {
@@ -28,18 +29,17 @@ class Accounts extends Component {
     }
     else {
       const cards =
-        this.props.accounts.map((account) => <Card key={account.id}>
-          <Card.Content>
-            <Card.Header>{account.name}</Card.Header>
-          </Card.Content>
-          <Card.Content extra>
-            {this.state.shareCodes[account.id] &&
-            <Message info positive>Kidlink code is {this.state.shareCodes[account.id]}</Message>}
-            <div>
-              <Button onClick={() => this.handleShareClick(account)}>Share</Button>
-            </div>
-          </Card.Content>
-        </Card>);
+        this.props.accounts.map((account) => <Account
+          key={account.id}
+          account={account}
+          shareCode={this.state.shareCodes[account.id]}
+          onShare={(evt) => {
+            evt.stopPropagation();
+            this.handleShareClick(account);
+          }
+          }
+          onClick={() => this.handleAccountClick(account)}
+        />);
 
       listArea = (
         <div className="List">
@@ -90,6 +90,11 @@ class Accounts extends Component {
       .then(() => {
         this.handleCreateDone();
       })
+  };
+
+  handleAccountClick = (account) => {
+    console.log("Account clicked", account);
+    this.props.history.push(`/parent/account/${account.id}`);
   }
 }
 
@@ -98,7 +103,8 @@ const mapStateToProps = (state) => {
 
   return {
     isFetching: accounts.isFetching,
-    accounts: accounts.list
+    accounts: accounts.byId ? Object.entries(accounts.byId).map(entry => entry[1]) : []
+
   }
 };
 

@@ -12,7 +12,7 @@ class Welcome extends Component {
 
     let loginBit;
     if (this.props.isFetchingUser) {
-      loginBit = <Loader/>;
+      loginBit = <Loader active inline/>;
     }
     else if (this.props.loggedIn) {
       return <Redirect to={'/' + this.props.role}/>
@@ -24,7 +24,6 @@ class Welcome extends Component {
     return (
       <div>
         <div className="Welcome-banner">
-          <h1>Welcome to</h1>
           <KidsbankLogo autosize={true} centered={true}/>
         </div>
         {loginBit}

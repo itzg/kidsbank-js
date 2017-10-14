@@ -12,13 +12,12 @@ class KidsbankLogo extends Component {
 
   render() {
     return <Image className="KidsbankLogo" src={logoSrc} centered={this.props.centered}
-                  size={this.props.small ? 'small' : undefined}/>
+                  size={this.props.size}/>
   }
 
   // noinspection JSUnusedGlobalSymbols
   static propsTypes = {
-    autosize: PropTypes.bool,
-    small: PropTypes.bool,
+    size: PropTypes.bool,
     centered: PropTypes.bool
   };
 

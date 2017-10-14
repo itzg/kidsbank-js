@@ -54,17 +54,17 @@ export function loginParent() {
 
 const handleLoginOrRegisterFailed = (response) => {
   if (response.status === 403) {
-    const detail = {};
-
     let reason = response.headers.get('X-Reason');
-    let field = response.headers.get('X-Reason-Field');
-    if (field) {
-      detail[field] = reason;
-    } else {
-      detail._error = reason;
-    }
+    let reasonType = response.headers.get('X-Reason-Type');
 
-    return Promise.reject(new SubmissionError(detail));
+    if (reasonType === 'BadCredentialFieldException') {
+      return response.json()
+        .then((json) => {
+          return Promise.reject(new SubmissionError(json));
+        })
+    } else {
+      return Promise.reject(new SubmissionError({_error: reason}));
+    }
   }
   else {
     return Promise.reject(response);

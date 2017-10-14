@@ -37,5 +37,10 @@ public class MongoIndexes {
                 .ensureIndex(new Index()
                                      .on("created", Sort.Direction.ASC)
                                      .expire(properties.getKidlinkExpiration(), TimeUnit.SECONDS));
+
+        mongoTemplate.indexOps(Transaction.class)
+                .ensureIndex(new Index()
+                                     .on(Transaction.FIELD_ACCOUNT_ID, Sort.Direction.ASC)
+                                     .on(Transaction.FIELD_WHEN, Sort.Direction.DESC));
     }
 }

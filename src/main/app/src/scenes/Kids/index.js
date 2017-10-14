@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {fetchUserProfile, logoutUser} from '../../actions/user';
-import {Dropdown, Loader, Menu} from 'semantic-ui-react';
-import {Link, Redirect, Switch} from 'react-router-dom';
+import {Button, Loader} from 'semantic-ui-react';
+import {Link, Redirect} from 'react-router-dom';
 import KidsbankLogo from '../../components/KidsbankLogo'
+import './index.css';
 
 class Kids extends Component {
   constructor(props) {
@@ -12,7 +13,7 @@ class Kids extends Component {
 
   render() {
     if (this.props.isFetchingUser) {
-      return <Loader/>
+      return <Loader active inline/>
     }
     else if (!this.props.loggedIn) {
       return <Redirect to="/"/>
@@ -30,24 +31,18 @@ class Kids extends Component {
 
       return (
         <div className="Kids">
-          <Menu attached='top' pointing>
-            <Menu.Item as={Link} to="/parent" header><KidsbankLogo small={true}/></Menu.Item>
+          <div className="header">
+            <div><Link to='/kid'><KidsbankLogo size='medium'/></Link></div>
 
-            <Menu.Menu position='right'>
-              <Dropdown item trigger={profileHeader}>
-                <Dropdown.Menu>
-                  <Dropdown.Item text="Logout" onClick={() => this.props.onLogout()}/>
-                </Dropdown.Menu>
-              </Dropdown>
-            </Menu.Menu>
-          </Menu>
-
-          <Switch>
-          </Switch>
+            <div className="info">
+              <span>You are logged in as {this.props.profile.displayName}</span>
+              <Button onClick={() => this.props.onLogout()}>Logout</Button>
+            </div>
+          </div>
         </div>
-      )
-    }
+      );
 
+    }
   }
 
   componentDidMount() {
@@ -55,27 +50,34 @@ class Kids extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const
+  mapStateToProps = (state) => {
 
-  const {user} = state;
+    const {user} = state;
 
-  return {
-    isFetchingUser: user.isFetching,
-    profile: user.profile,
-    loggedIn: user.loggedIn,
-    role: user.role
-  }
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    onLogout: () => {
-      dispatch(logoutUser());
-    },
-    fetchUserProfile: () => {
-      dispatch(fetchUserProfile());
+    return {
+      isFetchingUser: user.isFetching,
+      profile: user.profile,
+      loggedIn: user.loggedIn,
+      role: user.role
     }
-  }
-};
+  };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Kids);
+const
+  mapDispatchToProps = (dispatch) => {
+    return {
+      onLogout: () => {
+        dispatch(logoutUser());
+      },
+      fetchUserProfile: () => {
+        dispatch(fetchUserProfile());
+      }
+    }
+  };
+
+export default connect(mapStateToProps, mapDispatchToProps)
+
+(
+  Kids
+)
+;

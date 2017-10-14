@@ -1,7 +1,10 @@
 package me.itzg.kidsbank.types;
 
 import lombok.Data;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.core.CredentialsContainer;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Geoff Bourne
@@ -9,7 +12,9 @@ import org.springframework.security.core.CredentialsContainer;
  */
 @Data
 public class KidLogin implements CredentialsContainer {
+    @NotEmpty
     String username;
+    @NotNull
     String password;
 
     @Override

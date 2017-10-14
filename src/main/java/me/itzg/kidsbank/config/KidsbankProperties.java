@@ -30,4 +30,7 @@ public class KidsbankProperties {
     @Min(4)
     @Max(31)
     int passwordBcryptStrength = 10;
+
+    @Min(1)
+    int defaultTransactionQueryLimit = 15;
 }

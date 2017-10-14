@@ -14,9 +14,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author Geoff Bourne
@@ -27,14 +30,17 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
     private final PasswordEncoder passwordEncoder;
     private final KidlinkService kidlinkService;
     private final MongoTemplate mongoTemplate;
+    private final Validator validator;
 
     @Autowired
     public KidAuthenticationProvider(PasswordEncoder passwordEncoder,
                                      KidlinkService kidlinkService,
-                                     MongoTemplate mongoTemplate) {
+                                     MongoTemplate mongoTemplate,
+                                     LocalValidatorFactoryBean validatorFactory) {
         this.passwordEncoder = passwordEncoder;
         this.kidlinkService = kidlinkService;
         this.mongoTemplate = mongoTemplate;
+        validator = validatorFactory.getValidator();
     }
 
     @Override
@@ -56,22 +62,18 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
 
     private Authentication handleLogin(KidAuthenticationToken kidAuth) throws AuthenticationException {
         final KidLogin login = kidAuth.getKidLogin();
-        //TODO replace these with Spring validation
-        if (StringUtils.isEmpty(login.getUsername())) {
-            throw new BadCredentialFieldException("Missing username", "username");
-        }
-        if (StringUtils.isEmpty(login.getPassword())) {
-            throw new BadCredentialFieldException("Missing password", "password");
-        }
+
+        final Set<ConstraintViolation<KidLogin>> constraintViolations = validator.validate(login);
+        processConstraintViolations(constraintViolations);
 
         final Kid kid = mongoTemplate.findById(login.getUsername(), Kid.class);
         //noinspection ConstantConditions
         if (kid == null) {
-            throw new BadCredentialFieldException("Unknown username", "username");
+            throw new BadCredentialFieldException("Unable to find login info", "username", "Unknown username");
         }
 
         if (!passwordEncoder.matches(login.getPassword(), kid.getEncPassword())) {
-            throw new BadCredentialFieldException("Wrong password", "password");
+            throw new BadCredentialFieldException("Invalid login", "password", "Wrong password");
         }
 
         return new KidAuthenticationToken(new AuthenticatedKid(kid),
@@ -82,18 +84,8 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
     private Authentication handleRegistration(KidAuthenticationToken kidAuth) throws AuthenticationException {
 
         final KidRegistration registration = kidAuth.getKidRegistration();
-
-        if (StringUtils.isEmpty(registration.getUsername())) {
-            throw new BadCredentialFieldException("Missing username for registration", "username");
-        }
-
-        if (StringUtils.isEmpty(registration.getPassword())) {
-            throw new BadCredentialFieldException("Missing password for registration", "password");
-        }
-
-        if (StringUtils.isEmpty(registration.getKidlinkCode())) {
-            throw new BadCredentialFieldException("Missing kidlink code for registration", "kidlinkCode");
-        }
+        final Set<ConstraintViolation<KidRegistration>> constraintViolations = validator.validate(registration);
+        processConstraintViolations(constraintViolations);
 
         final Kid kid = new Kid();
         kid.setUsername(registration.getUsername());
@@ -101,14 +93,16 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
         try {
             mongoTemplate.insert(kid);
         } catch (DataIntegrityViolationException e) {
-            throw new BadCredentialFieldException("Username is already taken", "username");
+            throw new BadCredentialFieldException("Username is already taken", "username", "Username is already taken");
         }
 
         final Kidlink kidlink = kidlinkService.useCode(registration.getKidlinkCode());
         if (kidlink == null) {
             // optimistic creation of username needs to be undone
             mongoTemplate.remove(kid);
-            throw new BadCredentialFieldException("Invalid or expired kidlink code", "kidlinkCode");
+            throw new BadCredentialFieldException("Invalid or expired kidlink code",
+                                                  "kidlinkCode",
+                                                  "Invalid or expired kidlink code");
         }
 
         kid.setEncPassword(passwordEncoder.encode(registration.getPassword()));
@@ -120,6 +114,17 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
         return new KidAuthenticationToken(new AuthenticatedKid(kid),
                                           kidAuth,
                                           Collections.singletonList(Authorities.KID_AUTHORITY));
+    }
+
+    private <T> void processConstraintViolations(Set<ConstraintViolation<T>> constraintViolations) {
+        if (!constraintViolations.isEmpty()) {
+            final BadCredentialFieldException e = new BadCredentialFieldException(
+                    "Failed to validate");
+            constraintViolations.forEach(v -> {
+                e.addFieldMessage(v.getPropertyPath().toString(), v.getMessage());
+            });
+            throw e;
+        }
     }
 
     @Override

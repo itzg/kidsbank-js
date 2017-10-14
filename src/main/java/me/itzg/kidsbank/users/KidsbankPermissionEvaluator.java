@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 
 /**
+ * This component declares the object type permissions referenced in <code>hasPermission</code> usage within
+ * {@link org.springframework.security.access.prepost.PreAuthorize} annotations.
+ *
  * @author Geoff Bourne
  * @since Sep 2017
  */
@@ -50,6 +53,14 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
                     case Permissions.VIEW:
                         //TODO kids can also view their specific account
                         return parentHasAccount(userId, targetId.toString());
+
+                    case Permissions.READ_ENTRIES:
+                        //TODO kids can also view their specific account
+                        return parentHasAccount(userId, targetId.toString());
+
+                    case Permissions.MODIFY_ENTRIES:
+                        return parentHasAccount(userId, targetId.toString());
+
                 }
 
                 break;

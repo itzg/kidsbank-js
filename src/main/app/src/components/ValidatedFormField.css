@@ -1,0 +1,17 @@
+
+.ValidatedFormField > div.Message {
+    margin-bottom: 1em;
+    font-style: italic;
+}
+
+.ValidatedFormField .field.error {
+    margin-bottom: 2px;
+}
+
+.ValidatedFormField > div.Message.Warning {
+    color: #ab6805;
+}
+
+.ValidatedFormField > div.Message.Error {
+    color: #9f3a38;
+}

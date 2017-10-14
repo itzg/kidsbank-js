@@ -1,0 +1,14 @@
+.Kids .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.Kids .header > * {
+    flex: 0 1 auto;
+}
+
+.Kids .header .info > * + * {
+    margin-left: 1em;
+}

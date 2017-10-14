@@ -1,7 +1,7 @@
 
 .Accounts {
     text-align: left;
-    margin: 10px;
+    margin: var(--scene-margin);
 }
 
 .Accounts .ListActions {

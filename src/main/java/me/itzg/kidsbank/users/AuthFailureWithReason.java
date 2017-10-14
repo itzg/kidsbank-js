@@ -1,5 +1,6 @@
 package me.itzg.kidsbank.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.itzg.kidsbank.errors.BadCredentialFieldException;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -18,21 +19,25 @@ public class AuthFailureWithReason implements AuthenticationFailureHandler {
 
     public static final String REASON_TYPE = "X-Reason-Type";
     public static final String REASON = "X-Reason";
-    public static final String REASON_FIELD = "X-Reason-Field";
+    private ObjectMapper objectMapper;
+
+    public AuthFailureWithReason(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
+        // It's required to set the status before writing to the body. Otherwise it'll force an OK status.
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.addHeader(REASON_TYPE, exception.getClass().getSimpleName());
         response.addHeader(REASON, exception.getMessage());
         if (exception instanceof BadCredentialFieldException) {
-            final String field = ((BadCredentialFieldException) exception).getField();
-            response.addHeader(REASON_FIELD, field);
+            objectMapper.writeValue(response.getWriter(),
+                                    ((BadCredentialFieldException) exception).getFieldMessages());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setContentType(MediaType.TEXT_PLAIN_VALUE);
-        response.getWriter().print(exception.getMessage());
         response.getWriter().flush();
     }
 }

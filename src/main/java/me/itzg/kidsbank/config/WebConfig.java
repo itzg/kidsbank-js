@@ -2,6 +2,7 @@ package me.itzg.kidsbank.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.itzg.kidsbank.users.Authorities;
+import me.itzg.kidsbank.users.ImpersonateAuthFilter;
 import me.itzg.kidsbank.users.KidAuthenticationProvider;
 import me.itzg.kidsbank.users.KidLoginAuthFilter;
 import me.itzg.kidsbank.users.KidRegisterAuthFilter;
@@ -9,6 +10,7 @@ import me.itzg.kidsbank.web.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,6 +39,7 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
     private final SocialUserDetailsService userAccountService;
     private final ObjectMapper objectMapper;
     private final KidAuthenticationProvider kidAuthenticationProvider;
+    private Environment env;
 
     private final UserIdSource userIdSource;
 
@@ -51,13 +54,15 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
                              SocialAuthenticationServiceLocator socialAuthenticationServiceLocator,
                      SocialUserDetailsService userAccountService,
                      ObjectMapper objectMapper,
-                     KidAuthenticationProvider kidAuthenticationProvider) {
+                     KidAuthenticationProvider kidAuthenticationProvider,
+                     Environment env) {
         this.userIdSource = userIdSource;
         this.usersConnectionRepository = usersConnectionRepository;
         this.socialAuthenticationServiceLocator = socialAuthenticationServiceLocator;
         this.userAccountService = userAccountService;
         this.objectMapper = objectMapper;
         this.kidAuthenticationProvider = kidAuthenticationProvider;
+        this.env = env;
     }
 
     @SuppressWarnings("RedundantThrows")
@@ -86,6 +91,11 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(kidLoginFilter(), AbstractPreAuthenticatedProcessingFilter.class)
                 .logout().deleteCookies("JSESSIONID").logoutUrl(Paths.SIGNOUT).logoutSuccessUrl(Paths.ROOT)
         ;
+
+        if (env.acceptsProfiles(Profiles.IMPERSONATE)) {
+            http.addFilterBefore(new ImpersonateAuthFilter("/api/**"),
+                                 SocialAuthenticationFilter.class);
+        }
     }
 
     @Bean

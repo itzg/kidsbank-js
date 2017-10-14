@@ -17,7 +17,7 @@ const KidRegisterForm = (props) => {
 
       <div className='Actions'>
         <Button disabled={props.invalid} loading={props.submitting} type='submit' primary>Login</Button>
-        or <Button basic onClick={onSwitchToRegister}>Switch to Register</Button>
+        or need an account? <Button basic onClick={onSwitchToRegister}>Register</Button>
       </div>
     </Form>
   );

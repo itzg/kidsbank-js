@@ -19,7 +19,13 @@ function fetchAccountsSuccess(accounts) {
 }
 
 export function fetchParentManagedAccounts() {
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    const {accounts} = getState();
+
+    if (!accounts.isPartial && accounts.byId) {
+      return;
+    }
+
     dispatch(fetchAccountsStart());
 
     getJson('/api/parent/accounts')
@@ -29,6 +35,45 @@ export function fetchParentManagedAccounts() {
       }, err => {
         console.error('failed', err);
       })
+  }
+}
+
+export const FETCH_SINGLE_ACCOUNT_START = 'FETCH_SINGLE_ACCOUNT_START';
+
+export function fetchSingleAccountStart(accountId) {
+  return {
+    type: FETCH_SINGLE_ACCOUNT_START,
+    accountId
+  }
+}
+
+export const FETCH_SINGLE_ACCOUNT_SUCCESS = 'FETCH_SINGLE_ACCOUNT_SUCCESS';
+
+export function fetchSingleAccountSuccess(account) {
+  return {
+    type: FETCH_SINGLE_ACCOUNT_SUCCESS,
+    account
+  }
+}
+
+export function fetchSingleAccount(accountId) {
+  return (dispatch, getState) => {
+    const {accounts} = getState();
+
+    if (accounts.byId && accounts.byId[accountId]) {
+      return;
+    }
+
+    dispatch(fetchSingleAccountStart(accountId));
+
+    getJson(`/api/parent/accounts/${accountId}`)
+      .then(json => {
+        console.log('success', json);
+        dispatch(fetchSingleAccountSuccess(json))
+      }, err => {
+        console.error('failed', err);
+      })
+
   }
 }
 

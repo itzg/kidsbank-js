@@ -25,7 +25,7 @@ public class KidLoginAuthFilter extends AbstractAuthenticationProcessingFilter {
     public KidLoginAuthFilter(String defaultFilterProcessesUrl, ObjectMapper objectMapper) {
         super(new AntPathRequestMatcher(defaultFilterProcessesUrl, HttpMethod.POST.toString()));
         setAuthenticationSuccessHandler(new OkSuccessHandler());
-        setAuthenticationFailureHandler(new AuthFailureWithReason());
+        setAuthenticationFailureHandler(new AuthFailureWithReason(objectMapper));
         this.objectMapper = objectMapper;
     }
 
