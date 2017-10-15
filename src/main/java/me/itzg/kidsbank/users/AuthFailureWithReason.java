@@ -2,6 +2,7 @@ package me.itzg.kidsbank.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.itzg.kidsbank.errors.BadCredentialFieldException;
+import me.itzg.kidsbank.types.ErrorResponseBody;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -17,8 +18,6 @@ import java.io.IOException;
  */
 public class AuthFailureWithReason implements AuthenticationFailureHandler {
 
-    public static final String REASON_TYPE = "X-Reason-Type";
-    public static final String REASON = "X-Reason";
     private ObjectMapper objectMapper;
 
     public AuthFailureWithReason(ObjectMapper objectMapper) {
@@ -31,13 +30,18 @@ public class AuthFailureWithReason implements AuthenticationFailureHandler {
                                         AuthenticationException exception) throws IOException, ServletException {
         // It's required to set the status before writing to the body. Otherwise it'll force an OK status.
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.addHeader(REASON_TYPE, exception.getClass().getSimpleName());
-        response.addHeader(REASON, exception.getMessage());
+
+        final ErrorResponseBody error = new ErrorResponseBody();
+        error.setMessage(exception.getMessage());
+        error.setError(exception.getClass().getSimpleName());
+        error.setStatus(HttpServletResponse.SC_FORBIDDEN);
         if (exception instanceof BadCredentialFieldException) {
-            objectMapper.writeValue(response.getWriter(),
-                                    ((BadCredentialFieldException) exception).getFieldMessages());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            error.setErrors(
+                    ((BadCredentialFieldException) exception).getFieldMessages().entrySet()
+            );
         }
+        objectMapper.writeValue(response.getWriter(), error);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().flush();
     }
 }

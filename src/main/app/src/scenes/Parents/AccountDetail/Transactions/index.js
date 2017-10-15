@@ -28,9 +28,6 @@ function ExpenseCell(props) {
 }
 
 class Transactions extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   static formatDate(date) {
     return moment(date).calendar(null, {

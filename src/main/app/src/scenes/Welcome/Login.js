@@ -55,7 +55,7 @@ class Login extends Component {
       </div>
     )
 
-  };
+  }
 
   chooseParentLogin = () => {
     this.setState({loginType: LOGIN_TYPE_PARENT});
@@ -63,7 +63,7 @@ class Login extends Component {
 
   chooseKidLogin = () => {
     this.setState({loginType: LOGIN_TYPE_KID});
-  }
+  };
 
   unchooseType = () => {
     this.setState({loginType: null});
@@ -76,7 +76,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    handleParentLogin: () => {
+    handleParentLogin() {
       dispatch(loginParent());
     }
 

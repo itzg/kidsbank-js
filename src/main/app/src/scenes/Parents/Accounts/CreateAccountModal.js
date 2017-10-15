@@ -4,9 +4,6 @@ import {Field, reduxForm} from 'redux-form';
 import ValidatedFormField from "../../../components/ValidatedFormField";
 
 class CreateAccountModal extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
 

@@ -6,9 +6,6 @@ import './KidsbankLogo.css';
 import logoSrc from './kidsbank-main.png';
 
 class KidsbankLogo extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return <Image className="KidsbankLogo" src={logoSrc} centered={this.props.centered}

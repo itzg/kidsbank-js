@@ -18,7 +18,7 @@ const ValidatedFormField = props => {
   const {meta} = props;
   return (
     <div className='ValidatedFormField'>
-      <Form.Field attach {...props} error={meta.invalid}/>
+      <Form.Field {...props} error={meta.invalid}/>
       {meta.warning && <div className='Message Warning'>{meta.warning}</div>}
       {meta.invalid && <div className='Message Error'>{meta.error}</div>}
     </div>

@@ -44,7 +44,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onLogin: (values) => {
+    onLogin(values) {
       const {
         username,
         password
@@ -52,7 +52,7 @@ const mapDispatchToProps = (dispatch) => {
       return dispatch(loginKid(username, password));
     },
 
-    onRegister: (values) => {
+    onRegister(values) {
       const {
         username,
         password,

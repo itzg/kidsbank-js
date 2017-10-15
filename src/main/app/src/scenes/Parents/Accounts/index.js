@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {Button, Loader} from 'semantic-ui-react';
 import CreateAccountModal from "./CreateAccountModal";
 import {createAccount, fetchParentManagedAccounts, shareAccount} from '../../../actions/accounts';
-import {submitForm} from '../../../actions/Forms';
 import Account from './Account';
 import './index.css';
 

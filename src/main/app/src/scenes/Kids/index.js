@@ -22,12 +22,6 @@ class Kids extends Component {
       return <Redirect to="/"/>
     }
     else {
-      const profileHeader = (
-        <div>
-          {this.props.profile.displayName}
-        </div>
-      );
-
       return (
         <div className="Kids">
           <div className="header">
@@ -87,9 +81,4 @@ const
     }
   };
 
-export default connect(mapStateToProps, mapDispatchToProps)
-
-(
-  Kids
-)
-;
+export default connect(mapStateToProps, mapDispatchToProps)(Kids);

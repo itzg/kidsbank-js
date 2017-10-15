@@ -7,9 +7,6 @@ import {fetchSingleAccount} from '../../actions/accounts';
  * A route component.
  */
 class AccountSpecificTab extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     const accountId = this.props.match.params.accountId;

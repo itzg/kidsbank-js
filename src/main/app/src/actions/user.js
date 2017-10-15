@@ -28,6 +28,7 @@ export function fetchUserProfile() {
         }
         else {
           dispatch(receiveUserProfile(null));
+          return Promise.resolve();
         }
       }
       return Promise.reject();
@@ -53,26 +54,22 @@ export function loginParent() {
   }
 }
 
-const handleLoginOrRegisterFailed = (response) => {
-  if (response.status === 403) {
-    let reason = response.headers.get('X-Reason');
-    let reasonType = response.headers.get('X-Reason-Type');
+function handleLoginOrRegisterFailed(err) {
+  if (err.status === 403) {
+    let reason = err.message;
+    let reasonType = err.error;
 
     if (reasonType === 'BadCredentialFieldException') {
-      return response.json()
-        .then((json) => {
-          return Promise.reject(new SubmissionError(json));
-        })
+      const payload = Object.assign({}, ...err.errors);
+      return Promise.reject(new SubmissionError(payload));
     } else {
       return Promise.reject(new SubmissionError({_error: reason}));
     }
   }
   else {
-    return Promise.reject(response);
+    return Promise.reject(err);
   }
-};
-
-export const LOGIN_KID = 'LOGIN_KID';
+}
 
 export function loginKid(username, password) {
   return (dispatch) => {
@@ -90,8 +87,6 @@ export function loginKid(username, password) {
   }
 }
 
-export const REGISTER_KID = 'REGISTER_KID';
-
 export function registerKid(username, password, kidlinkCode) {
   return (dispatch) => {
     return postJson('/kid-register', {
@@ -108,8 +103,6 @@ export function registerKid(username, password, kidlinkCode) {
       )
   }
 }
-
-export const LOGOUT_USER = 'LOGOUT_USER';
 
 export function logoutUser() {
   return () => {

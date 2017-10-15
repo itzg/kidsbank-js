@@ -9,9 +9,6 @@ import AccountDetail from './AccountDetail';
 import AccountSpecificTab from './AccountSpecificTab';
 
 class Parents extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     if (this.props.isFetchingUser) {
