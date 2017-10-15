@@ -17,6 +17,7 @@ import java.util.Date;
 public class Transaction {
     public static final String FIELD_ACCOUNT_ID = "accountId";
     public static final String FIELD_WHEN = "when";
+    public static final String FIELD_AMOUNT = "amount";
 
     @Id
     String id;

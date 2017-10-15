@@ -56,7 +56,7 @@ const
     const {user} = state;
 
     return {
-      isFetchingUser: user.isFetching,
+      isFetchingUser: user.loading,
       profile: user.profile,
       loggedIn: user.loggedIn,
       role: user.role

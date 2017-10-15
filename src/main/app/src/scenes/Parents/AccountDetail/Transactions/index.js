@@ -1,11 +1,17 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Header, Icon, Loader, Message, Table} from 'semantic-ui-react';
-import {loadInitialTransactions} from "../../../../actions/transactions";
+import {Button, Header, Icon, Loader, Message, Table} from 'semantic-ui-react';
+import {
+  loadInitialTransactions,
+  loadNewerTransactions,
+  loadOlderTransactions,
+  reloadInitialTransactions
+} from "../../../../actions/transactions";
 import moment from 'moment';
 import {formatCurrency} from '../../../../components/locale';
 import './index.css';
+import {fetchAccountBalance} from "../../../../actions/accounts";
 
 function IncomeCell(props) {
   if (props.amount < 0) {
@@ -49,9 +55,11 @@ class Transactions extends Component {
 
       let tableBody;
       if (this.props.loaded && this.props.loading) {
-        tableBody = <Table.Cell colspan={4}>
-          <Loader active inline/>
-        </Table.Cell>;
+        tableBody = <Table.Row>
+          <Table.Cell colSpan={4}>
+            <Loader active inline/>
+          </Table.Cell>
+        </Table.Row>;
       }
       else {
         tableBody = this.props.page.content.map(t => <Table.Row key={t.id}>
@@ -68,13 +76,34 @@ class Transactions extends Component {
             <Table.Row>
               <Table.HeaderCell width={2}>Date</Table.HeaderCell>
               <Table.HeaderCell>Description</Table.HeaderCell>
-              <Table.HeaderCell colspan={2} width={4} textAlign='center'>Amount</Table.HeaderCell>
+              <Table.HeaderCell colSpan={2} width={4} textAlign='center'>Amount</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 
           <Table.Body>
             {tableBody}
           </Table.Body>
+
+          <Table.Footer>
+            <Table.Row>
+              <Table.HeaderCell colSpan={4}>
+
+                <div className='navigate'>
+
+                  {!this.props.page.first &&
+                  <Button content='Newer' icon='left chevron' labelPosition='left'
+                          onClick={this.props.loadNewerTransactions} className='newer'/>}
+                  <div className='reload'>
+                    <Button content='Reload' icon='refresh' onClick={this.props.reloadTransactions}/>
+                  </div>
+                  {!this.props.page.last &&
+                  <Button content='Older' icon='right chevron' labelPosition='right'
+                          onClick={this.props.loadOlderTransactions} className='older'/>}
+
+                </div>
+              </Table.HeaderCell>
+            </Table.Row>
+          </Table.Footer>
         </Table>
       );
     }
@@ -92,7 +121,7 @@ class Transactions extends Component {
   }
 
   static propTypes = {
-    accountId: PropTypes.string.required
+    accountId: PropTypes.string
   }
 }
 
@@ -115,6 +144,19 @@ function mapDispatchToProps(dispatch, ownProps) {
   return {
     loadInitialTransactions() {
       dispatch(loadInitialTransactions(ownProps.accountId));
+    },
+
+    reloadTransactions() {
+      dispatch(reloadInitialTransactions(ownProps.accountId));
+      dispatch(fetchAccountBalance(ownProps.accounts, true));
+    },
+
+    loadOlderTransactions() {
+      dispatch(loadOlderTransactions(ownProps.accountId));
+    },
+
+    loadNewerTransactions() {
+      dispatch(loadNewerTransactions(ownProps.accountId));
     }
   }
 }

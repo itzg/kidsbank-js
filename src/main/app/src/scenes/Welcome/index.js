@@ -12,7 +12,7 @@ class Welcome extends Component {
 
     let loginBit;
     if (this.props.isFetchingUser) {
-      loginBit = <Loader active inline/>;
+      loginBit = <Loader active/>;
     }
     else if (this.props.loggedIn) {
       return <Redirect to={'/' + this.props.role}/>

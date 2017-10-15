@@ -67,6 +67,11 @@ public class ParentApi {
         return transactionsService.createTransaction(principal.getName(), accountId, transactionCreation);
     }
 
+    @GetMapping("accounts/{accountId}/balance")
+    public ResponseValue<Float> getAccountBalance(@PathVariable String accountId) {
+        return new ResponseValue<>(accountsService.getBalance(accountId));
+    }
+
     @GetMapping("accounts/{accountId}/transactions")
     public Page<Transaction> getTransactions(Principal principal, @PathVariable String accountId, Pageable pageable) {
         return transactionsService.getTransactions(principal.getName(), accountId, pageable);

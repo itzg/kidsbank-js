@@ -1,3 +1,8 @@
 .AccountDetail {
     margin: var(--scene-margin);
 }
+
+.AccountDetail .balance-container {
+    margin-bottom: 20px;
+    text-align: center;
+}

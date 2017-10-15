@@ -1,19 +1,23 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {fetchSingleAccount} from '../../../actions/accounts';
+import {fetchAccountBalance, fetchSingleAccount} from '../../../actions/accounts';
 import './index.css';
 import CreateTransaction from './CreateTransaction';
 import Transactions from './Transactions';
 import {createTransaction, loadInitialTransactions} from "../../../actions/transactions";
+import Balance from "../../../components/Balance";
 
+/**
+ * Used as a router component
+ */
 class AccountDetail extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return (
       <div className='AccountDetail'>
+        <div className='balance-container'>
+          <Balance fetching={this.props.balance.fetching} balance={this.props.balance.balance}/>
+        </div>
         <CreateTransaction onCreate={this.props.handleCreateTransaction}/>
         <Transactions accountId={this.props.match.params.accountId}/>
       </div>
@@ -21,25 +25,30 @@ class AccountDetail extends Component {
   }
 
   componentDidMount() {
-    this.props.handleLoadAccount(this.props.match.params.accountId);
+    this.props.handleLoadAccount();
   }
 }
 
-const mapStateToProps = (state) => {
-  return {};
-
+const mapStateToProps = (state, ownProps) => {
+  const accountId = ownProps.match.params.accountId;
+  return {
+    balance: state.accounts.balances[accountId] || {fetching: true}
+  };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    handleLoadAccount(accountId) {
+    handleLoadAccount() {
+      const accountId = ownProps.match.params.accountId;
       dispatch(fetchSingleAccount(accountId));
       dispatch(loadInitialTransactions(accountId));
+      dispatch(fetchAccountBalance(accountId));
     },
 
     handleCreateTransaction(when, description, amount) {
+      const accountId = ownProps.match.params.accountId;
       return dispatch(
-        createTransaction(ownProps.match.params.accountId,
+        createTransaction(accountId,
           when,
           description,
           amount));

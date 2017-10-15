@@ -20,7 +20,7 @@ class Accounts extends Component {
   render() {
     let listArea;
 
-    if (this.props.isFetching) {
+    if (this.props.loading) {
       listArea = <Loader active inline/>
     }
 
@@ -102,7 +102,7 @@ const mapStateToProps = (state) => {
   const {accounts} = state;
 
   return {
-    isFetching: accounts.isFetching,
+    loading: accounts.loading,
     accounts: accounts.byId ? Object.entries(accounts.byId).map(entry => entry[1]) : []
 
   }

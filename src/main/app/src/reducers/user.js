@@ -2,7 +2,7 @@ import {RECEIVE_USER_PROFILE, REQUEST_USER_PROFILE} from "../actions/user";
 import _ from 'lodash';
 
 export default function user(state = {
-                               isFetching: true,
+                               loading: true,
                                role: null,
                                profile: null,
                                loggedIn: false
@@ -11,12 +11,12 @@ export default function user(state = {
   switch (action.type) {
     case REQUEST_USER_PROFILE:
       return Object.assign({}, state, {
-        isFetching: true
+        loading: true
       });
 
     case RECEIVE_USER_PROFILE:
       return Object.assign({}, state, {
-        isFetching: false,
+        loading: false,
         profile: action.profile,
         loggedIn: action.profile && !_.isEmpty(action.profile.role),
         role: action.profile && _.toLower(action.profile.role)

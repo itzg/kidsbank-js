@@ -22,7 +22,7 @@ export function fetchParentManagedAccounts() {
   return (dispatch, getState) => {
     const {accounts} = getState();
 
-    if (!accounts.isPartial && accounts.byId) {
+    if (!accounts.isPartial && accounts.loaded) {
       return;
     }
 
@@ -126,6 +126,51 @@ export function shareAccount(account) {
     return postJson(`/api/parent/accounts/${account.id}/_share`)
       .then(json => {
         return json.value;
+      })
+  }
+}
+
+export const FETCH_ACCOUNT_BALANCE_START = 'FETCH_ACCOUNT_BALANCE_START';
+
+function fetchAccountBalanceStart(accountId) {
+  return {
+    type: FETCH_ACCOUNT_BALANCE_START,
+    accountId
+  }
+}
+
+export const FETCH_ACCOUNT_BALANCE_SUCCESS = 'FETCH_ACCOUNT_BALANCE_SUCCESS';
+
+function fetchAccountBalanceSuccess(accountId, balance) {
+  return {
+    type: FETCH_ACCOUNT_BALANCE_SUCCESS,
+    accountId,
+    balance
+  }
+}
+
+export const FETCH_ACCOUNT_BALANCE_SKIPPED = 'FETCH_ACCOUNT_BALANCE_SKIPPED';
+
+function fetchAccountBalanceSkipped(accountId) {
+  return {
+    type: FETCH_ACCOUNT_BALANCE_SKIPPED,
+    accountId
+  }
+}
+
+export function fetchAccountBalance(accountId, force = false) {
+  return (dispatch, getState) => {
+    const balance = getState().accounts.balances[accountId];
+    if (balance && !force) {
+      dispatch(fetchAccountBalanceSkipped(accountId));
+      return;
+    }
+
+    dispatch(fetchAccountBalanceStart(accountId));
+
+    return getJson(`/api/parent/accounts/${accountId}/balance`)
+      .then((json) => {
+        dispatch(fetchAccountBalanceSuccess(accountId, json.value));
       })
   }
 }

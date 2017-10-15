@@ -1,5 +1,7 @@
 import {
   CREATE_ACCOUNT_SUCCESS,
+  FETCH_ACCOUNT_BALANCE_START,
+  FETCH_ACCOUNT_BALANCE_SUCCESS,
   FETCH_ACCOUNTS_START,
   FETCH_ACCOUNTS_SUCCESS,
   FETCH_SINGLE_ACCOUNT_START,
@@ -7,23 +9,30 @@ import {
 } from "../actions/accounts";
 
 export default function accounts(state = {
-                                   isFetching: false,
+                                   loading: false,
+                                   loaded: false,
                                    list: [],
-                                   isCreating: false
+                                   byId: {},
+                                   isCreating: false,
+                                   balances: {} // [accountId] : { fetching, balance}
                                  },
                                  action) {
   switch (action.type) {
     case FETCH_ACCOUNTS_START:
-      return Object.assign({}, state, {
-        isFetching: true
-      });
+      return {
+        ...state,
+        loading: true
+      };
 
     case FETCH_ACCOUNTS_SUCCESS:
-      let newState = Object.assign({}, state, {
-        isFetching: false,
+      let newState = {
+        ...state,
+        loading: false,
+        loaded: true,
         isPartial: false,
-        byId: {}
-      });
+        byId: {},
+      };
+
       if (action.accounts) {
         let account;
         for (account of action.accounts) {
@@ -34,13 +43,16 @@ export default function accounts(state = {
 
     case FETCH_SINGLE_ACCOUNT_START:
       return {
-        isFetching: true,
+        ...state,
+        loading: true,
         byId: {...state.byId}
       };
 
     case FETCH_SINGLE_ACCOUNT_SUCCESS:
       return {
-        isFetching: false,
+        ...state,
+        loading: false,
+        loaded: true,
         isPartial: true,
         byId: {
           ...state.byId,
@@ -49,9 +61,36 @@ export default function accounts(state = {
       };
 
     case CREATE_ACCOUNT_SUCCESS:
-      return Object.assign({}, state, {
-        list: state.list.concat([action.account])
-      });
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.account.id]: action.account
+        }
+      };
+
+    case FETCH_ACCOUNT_BALANCE_START:
+      return {
+        ...state,
+        balances: {
+          ...state.balances,
+          [action.accountId]: {
+            fetching: true
+          }
+        }
+      };
+
+    case FETCH_ACCOUNT_BALANCE_SUCCESS:
+      return {
+        ...state,
+        balances: {
+          ...state.balances,
+          [action.accountId]: {
+            fetching: false,
+            balance: action.balance
+          }
+        }
+      };
 
     default:
       return state;

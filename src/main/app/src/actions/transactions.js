@@ -1,5 +1,8 @@
 import {getJson, postJson} from './RestApi';
 import {adaptValidationToSubmissionError} from "./Forms";
+import {fetchAccountBalance} from './accounts';
+
+export let defaultTransactionsPageSize = 10;
 
 export const CREATE_TRANSACTION = 'CREATE_TRANSACTION';
 export const CREATE_TRANSACTION_START = 'CREATE_TRANSACTION_START';
@@ -39,6 +42,8 @@ export function createTransaction(accountId, when, description, amount) {
 
         dispatch(reloadInitialTransactions(accountId));
 
+        dispatch(fetchAccountBalance(accountId, true));
+
         return Promise.resolve();
       }, adaptValidationToSubmissionError);
   }
@@ -52,10 +57,9 @@ export function loadInitialTransactions(accountId) {
   return (dispatch, getState) => {
 
     const {transactions} = getState();
-    if (transactions.byAccount[accountId] && (
-        transactions.byAccount[accountId].loaded ||
-        transactions.byAccount[accountId].loading)
-    ) {
+    const account = transactions.byAccount[accountId];
+
+    if (account && (account.loaded || account.loading)) {
       dispatch(loadTransactionsSkipped(accountId));
       return;
     }
@@ -66,12 +70,53 @@ export function loadInitialTransactions(accountId) {
 
 export function reloadInitialTransactions(accountId) {
   return (dispatch) => {
-    dispatch(loadTransactionsStart(accountId, 0));
+    return dispatch(loadPageOfTransactions(accountId, 0, defaultTransactionsPageSize));
+  }
+}
 
-    return getJson(`/api/parent/accounts/${accountId}/transactions`)
+export function loadPageOfTransactions(accountId, pageNumber, pageSize) {
+  return (dispatch) => {
+    dispatch(loadTransactionsStart(accountId, pageNumber));
+
+    return getJson(`/api/parent/accounts/${accountId}/transactions?page=${pageNumber}&size=${pageSize}`)
       .then(json => {
         dispatch(loadTransactionsSuccess(accountId, json));
       })
+
+  }
+}
+
+export function loadOlderTransactions(accountId) {
+  return (dispatch, getState) => {
+    const {transactions} = getState();
+    const account = transactions.byAccount[accountId];
+
+    if (!account) {
+      dispatch(loadInitialTransactions(accountId));
+    }
+    else if (!account.loaded || account.page.last) {
+      dispatch(loadTransactionsSkipped(accountId));
+      return;
+    }
+
+    return dispatch(loadPageOfTransactions(accountId, account.page.number + 1, account.page.size));
+  }
+}
+
+export function loadNewerTransactions(accountId) {
+  return (dispatch, getState) => {
+    const {transactions} = getState();
+    const account = transactions.byAccount[accountId];
+
+    if (!account) {
+      dispatch(loadInitialTransactions(accountId));
+    }
+    else if (!account.loaded || account.page.first) {
+      dispatch(loadTransactionsSkipped(accountId));
+      return;
+    }
+
+    return dispatch(loadPageOfTransactions(accountId, account.page.number - 1, account.page.size));
   }
 }
 
@@ -82,11 +127,11 @@ export function loadTransactionsSkipped(accountId) {
   }
 }
 
-export function loadTransactionsStart(accountId, offset) {
+export function loadTransactionsStart(accountId, pageNumber) {
   return {
     type: LOAD_TRANSACTIONS_START,
     accountId,
-    offset
+    pageNumber
   }
 }
 

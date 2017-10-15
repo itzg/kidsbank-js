@@ -1,3 +1,22 @@
 .Transactions {
-    margin-top: 10px;
+    margin-top: 25px;
+}
+
+.Transactions .navigate {
+    display: flex;
+    flex-direction: row;
+}
+
+.Transactions .navigate > .newer {
+    order: 1;
+}
+
+.Transactions .navigate > .reload {
+    order: 0;
+    flex-grow: 1;
+    text-align: left;
+}
+
+.Transactions .navigate > .older {
+    order: 2;
 }
