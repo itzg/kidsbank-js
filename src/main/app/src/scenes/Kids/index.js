@@ -3,13 +3,12 @@ import {connect} from 'react-redux';
 import {fetchUserProfile, logoutUser} from '../../actions/user';
 import {Button, Loader} from 'semantic-ui-react';
 import {Link, Redirect} from 'react-router-dom';
-import KidsbankLogo from '../../components/KidsbankLogo'
+import KidsbankLogo from '../../components/KidsbankLogo';
+import Balance from '../../components/Balance';
 import './index.css';
+import {fetchKidPrimaryAccountBalance} from "../../actions/accounts";
 
 class Kids extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     if (this.props.isFetchingUser) {
@@ -39,6 +38,10 @@ class Kids extends Component {
               <Button onClick={() => this.props.onLogout()}>Logout</Button>
             </div>
           </div>
+
+          <div className='balanceContainer'>
+            <Balance fetching={this.props.balance.fetching} balance={this.props.balance.balance} size='large'/>
+          </div>
         </div>
       );
 
@@ -46,7 +49,10 @@ class Kids extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchUserProfile();
+    this.props.fetchUserProfile()
+      .then(() => {
+        this.props.fetchPrimaryAccountBalance();
+      });
   }
 }
 
@@ -59,18 +65,24 @@ const
       isFetchingUser: user.loading,
       profile: user.profile,
       loggedIn: user.loggedIn,
-      role: user.role
+      role: user.role,
+      balance: state.accounts.primary.balance
     }
   };
 
 const
   mapDispatchToProps = (dispatch) => {
     return {
-      onLogout: () => {
+      onLogout() {
         dispatch(logoutUser());
       },
-      fetchUserProfile: () => {
-        dispatch(fetchUserProfile());
+
+      fetchUserProfile() {
+        return dispatch(fetchUserProfile());
+      },
+
+      fetchPrimaryAccountBalance() {
+        return dispatch(fetchKidPrimaryAccountBalance());
       }
     }
   };

@@ -12,3 +12,7 @@
 .Kids .header .info > * + * {
     margin-left: 1em;
 }
+
+.Kids .balanceContainer {
+    text-align: center;
+}

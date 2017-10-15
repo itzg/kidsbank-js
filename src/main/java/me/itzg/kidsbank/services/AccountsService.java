@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.errors.NotFoundException;
 import me.itzg.kidsbank.types.Account;
 import me.itzg.kidsbank.types.AccountCreation;
+import me.itzg.kidsbank.types.Kid;
 import me.itzg.kidsbank.types.Parent;
 import me.itzg.kidsbank.types.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,6 +119,22 @@ public class AccountsService {
         }
 
         return result.getMappedResults().get(0).getBalance();
+    }
+
+    public float getKidPrimaryAccountBalance(String kidUserId) throws NotFoundException {
+
+        final Kid kid = mongoTemplate.findById(kidUserId, Kid.class);
+        //noinspection ConstantConditions
+        if (kid == null) {
+            throw new NotFoundException(String.format("Unable to find kid account: %s", kidUserId));
+        }
+
+        if (kid.getAccounts().isEmpty()) {
+            log.warn("Kid account={} had no accounts", kidUserId);
+            return 0;
+        }
+
+        return getBalance(kid.getAccounts().get(0));
     }
 
     @Data

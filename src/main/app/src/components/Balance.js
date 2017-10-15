@@ -7,6 +7,11 @@ function Balance(props) {
   if (props.fetching) {
     return <Loader inline active/>;
   }
+  else if (typeof props.balance === 'undefined') {
+    // noinspection JSConstructorReturnsPrimitive
+    return null;
+  }
+
   return <Statistic value={formatCurrency(props.balance)} label='Balance' size={props.size}/>
 }
 

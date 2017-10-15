@@ -4,6 +4,8 @@ import {
   FETCH_ACCOUNT_BALANCE_SUCCESS,
   FETCH_ACCOUNTS_START,
   FETCH_ACCOUNTS_SUCCESS,
+  FETCH_PRIMARY_ACCOUNT_BALANCE_START,
+  FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS,
   FETCH_SINGLE_ACCOUNT_START,
   FETCH_SINGLE_ACCOUNT_SUCCESS
 } from "../actions/accounts";
@@ -14,7 +16,10 @@ export default function accounts(state = {
                                    list: [],
                                    byId: {},
                                    isCreating: false,
-                                   balances: {} // [accountId] : { fetching, balance}
+                                   balances: {}, // [accountId] : { fetching, balance}
+                                   primary: {
+                                     balance: {}
+                                   }
                                  },
                                  action) {
   switch (action.type) {
@@ -91,6 +96,30 @@ export default function accounts(state = {
           }
         }
       };
+
+    case FETCH_PRIMARY_ACCOUNT_BALANCE_START:
+      return {
+        ...state,
+        primary: {
+          ...state.primary,
+          balance: {
+            fetching: true
+          }
+        }
+      };
+
+    case FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS:
+      return {
+        ...state,
+        primary: {
+          ...state.primary,
+          balance: {
+            fetching: false,
+            balance: action.balance
+          }
+        }
+      };
+
 
     default:
       return state;

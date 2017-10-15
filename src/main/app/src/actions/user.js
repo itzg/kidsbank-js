@@ -13,7 +13,7 @@ export function fetchUserProfile() {
   return (dispatch, getState) => {
 
     if (getState().user.loggedIn) {
-      return;
+      return Promise.resolve();
     }
 
     dispatch(requestUserProfile());
@@ -21,15 +21,16 @@ export function fetchUserProfile() {
     return get('/api/currentUser').then((resp) => {
       if (resp.ok) {
         if (resp.status === 200) {
-          resp.json().then((data) => {
-            console.log('currentUser is', data);
+          return resp.json().then((data) => {
             dispatch(receiveUserProfile(data));
+            return Promise.resolve();
           });
         }
         else {
           dispatch(receiveUserProfile(null));
         }
       }
+      return Promise.reject();
     })
 
   };

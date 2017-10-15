@@ -28,12 +28,37 @@ export function fetchParentManagedAccounts() {
 
     dispatch(fetchAccountsStart());
 
-    getJson('/api/parent/accounts')
+    return getJson('/api/parent/accounts')
       .then(json => {
-        console.log('success', json);
         dispatch(fetchAccountsSuccess(json))
-      }, err => {
-        console.error('failed', err);
+      })
+  }
+}
+
+export const FETCH_PRIMARY_ACCOUNT_BALANCE_START = 'FETCH_PRIMARY_ACCOUNT_BALANCE_START';
+
+function fetchPrimaryAccountBalanceStart() {
+  return {
+    type: FETCH_PRIMARY_ACCOUNT_BALANCE_START
+  }
+}
+
+export const FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS = 'FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS';
+
+function fetchPrimaryAccountBalanceSuccess(balance) {
+  return {
+    type: FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS,
+    balance
+  }
+}
+
+export function fetchKidPrimaryAccountBalance() {
+  return (dispatch) => {
+    dispatch(fetchPrimaryAccountBalanceStart());
+
+    return getJson(`/api/kid/primary-account/balance`)
+      .then(json => {
+        dispatch(fetchPrimaryAccountBalanceSuccess(json.value));
       })
   }
 }
