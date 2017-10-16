@@ -1,5 +1,5 @@
 import React from 'react';
-import {Form} from 'semantic-ui-react';
+import {Form, Label} from 'semantic-ui-react';
 import './ValidatedFormField.css';
 
 /**
@@ -19,8 +19,8 @@ const ValidatedFormField = props => {
   return (
     <div className='ValidatedFormField'>
       <Form.Field {...props} error={meta.invalid}/>
-      {meta.warning && <div className='Message Warning'>{meta.warning}</div>}
-      {meta.invalid && <div className='Message Error'>{meta.error}</div>}
+      {meta.warning && <Label basic color='orange' pointing>{meta.warning}</Label>}
+      {meta.invalid && <Label basic color='red' pointing>{meta.error}</Label>}
     </div>
   );
 };
