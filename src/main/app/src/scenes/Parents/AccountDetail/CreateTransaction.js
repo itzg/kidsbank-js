@@ -13,7 +13,9 @@ class CreateTransaction extends Component {
 
   render() {
     if (this.state.creating) {
-      return <CreateTransactionForm onCreate={this.props.onCreate} onClose={this.handleStopCreate}/>
+      return <CreateTransactionForm onCreate={this.props.onCreate} onClose={this.handleStopCreate}
+                                    sessionTimeout={this.props.sessionTimeout}
+      />
     }
     else {
       return <Button size='large' primary onClick={this.handleStartCreate}>Create Transaction</Button>

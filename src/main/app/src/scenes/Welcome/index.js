@@ -15,7 +15,7 @@ class Welcome extends Component {
       loginBit = <Loader active/>;
     }
     else if (this.props.loggedIn) {
-      return <Redirect to={'/' + this.props.role}/>
+      return <Redirect push to={'/' + this.props.role}/>
     }
     else {
       loginBit = <Login/>
@@ -32,7 +32,7 @@ class Welcome extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(fetchUserProfile());
+    this.props.fetchUserProfile();
   }
 }
 
@@ -51,5 +51,13 @@ function mapStateToProps(state) {
   }
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchUserProfile() {
+      dispatch(fetchUserProfile());
+    }
+  }
+}
 
-export default connect(mapStateToProps)(Welcome);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Welcome);

@@ -131,7 +131,8 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
         filter.setSignupUrl(null);
         filter.setConnectionAddedRedirectUrl(Paths.PARENT);
         filter.setPostLoginUrl(Paths.PARENT);
-//        filter.setRememberMeServices(rememberMeServices());
+        // ...otherwise it redirect back to the last 403'ed API call
+        filter.setAlwaysUsePostLoginUrl(true);
         return filter;
     }
 

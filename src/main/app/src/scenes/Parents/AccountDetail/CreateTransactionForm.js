@@ -2,6 +2,7 @@ import React from 'react';
 import {Field, reduxForm} from 'redux-form';
 import {Form, Input} from 'semantic-ui-react';
 import DatePicker from 'react-datepicker';
+import {Prompt} from 'react-router-dom';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import {nonEmpty, number, required} from '../../../components/validators';
@@ -23,8 +24,12 @@ function MoneyField(props) {
 }
 
 function CreateTransactionForm(props) {
+  const promptMsg = props.sessionTimeout ? "Your login session has expired. Login again now?" :
+    "You have unsaved changes. Navigate anyway?";
+
   return (
     <Form onSubmit={props.handleSubmit}>
+      <Prompt when={props.dirty} message={promptMsg}/>
       <Form.Group>
         <Field name='when' component={DatePickerField} validate={required} label='Date' width={4}/>
         <Field name='description' component={Form.Input} validate={[required, nonEmpty]} label='Description' width={6}/>

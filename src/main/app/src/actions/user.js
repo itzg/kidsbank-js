@@ -55,7 +55,7 @@ export function loginParent() {
 }
 
 function handleLoginOrRegisterFailed(err) {
-  if (err.status === 403) {
+  if (err.status === 401) {
     let reason = err.message;
     let reasonType = err.error;
 
@@ -107,5 +107,13 @@ export function registerKid(username, password, kidlinkCode) {
 export function logoutUser() {
   return () => {
     window.location = '/signout';
+  }
+}
+
+export const SESSION_TIMEOUT = 'SESSION_TIMEOUT';
+
+export function markSessionTimeout() {
+  return {
+    type: SESSION_TIMEOUT
   }
 }

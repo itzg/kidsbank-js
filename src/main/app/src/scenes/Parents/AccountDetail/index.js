@@ -18,7 +18,7 @@ class AccountDetail extends Component {
         <div className='balance-container'>
           <Balance fetching={this.props.balance.fetching} balance={this.props.balance.balance}/>
         </div>
-        <CreateTransaction onCreate={this.props.handleCreateTransaction}/>
+        <CreateTransaction onCreate={this.props.handleCreateTransaction} sessionTimeout={this.props.sessionTimeout}/>
         <Transactions accountId={this.props.match.params.accountId}/>
       </div>
     );
@@ -32,7 +32,9 @@ class AccountDetail extends Component {
 const mapStateToProps = (state, ownProps) => {
   const accountId = ownProps.match.params.accountId;
   return {
-    balance: state.accounts.balances[accountId] || {fetching: true}
+    balance: state.accounts.balances[accountId] || {fetching: true},
+
+    sessionTimeout: state.user.session.timeout
   };
 };
 

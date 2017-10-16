@@ -28,18 +28,24 @@ public class AuthFailureWithReason implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request,
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-        // It's required to set the status before writing to the body. Otherwise it'll force an OK status.
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
         final ErrorResponseBody error = new ErrorResponseBody();
         error.setMessage(exception.getMessage());
         error.setError(exception.getClass().getSimpleName());
-        error.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+        final int status;
         if (exception instanceof BadCredentialFieldException) {
+            status = HttpServletResponse.SC_UNAUTHORIZED;
             error.setErrors(
                     ((BadCredentialFieldException) exception).getFieldMessages().entrySet()
             );
+        } else {
+            status = HttpServletResponse.SC_FORBIDDEN;
         }
+        error.setStatus(status);
+        response.setStatus(status);
+
+        // NOTE: It's required to set the status before writing to the body. Otherwise it'll force an OK status.
         objectMapper.writeValue(response.getWriter(), error);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().flush();

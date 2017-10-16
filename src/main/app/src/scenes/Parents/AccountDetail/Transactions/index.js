@@ -73,7 +73,7 @@ class Transactions extends Component {
             <Table.Row>
               <Table.HeaderCell width={2}>Date</Table.HeaderCell>
               <Table.HeaderCell>Description</Table.HeaderCell>
-              <Table.HeaderCell colSpan={2} width={4} textAlign='center'>Amount</Table.HeaderCell>
+              <Table.HeaderCell colSpan={2} width={4}>Amount</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 

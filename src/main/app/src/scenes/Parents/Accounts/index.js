@@ -109,15 +109,15 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    handleMount: () => {
+    handleMount() {
       dispatch(fetchParentManagedAccounts());
     },
 
-    handleShare: (account) => {
+    handleShare(account) {
       return dispatch(shareAccount(account));
     },
 
-    handleCreateAccount: (fields) => {
+    handleCreateAccount(fields) {
       return dispatch(createAccount(fields));
     }
   }
