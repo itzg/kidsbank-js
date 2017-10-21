@@ -13,6 +13,7 @@ import java.util.List;
 @Document
 @Data
 public class Kid {
+    public static final String FIELD_ACCOUNTS = "accounts";
 
     @Id
     String username;

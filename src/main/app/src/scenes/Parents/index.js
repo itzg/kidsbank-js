@@ -7,12 +7,13 @@ import KidsbankLogo from '../../components/KidsbankLogo'
 import Accounts from './Accounts';
 import AccountDetail from './AccountDetail';
 import AccountSpecificTab from './AccountSpecificTab';
+import Manage from './Manage';
 
 class Parents extends Component {
 
   render() {
     if (this.props.isFetchingUser) {
-      return <Loader active inline/>
+      return <Loader active/>
     }
     else if (!this.props.loggedIn) {
       return <Redirect to="/"/>
@@ -33,7 +34,23 @@ class Parents extends Component {
         <Route key='top' path="/parent" render={(props) =>
           <Menu.Item as={Link} to="/parent" active={props.match.isExact}>Accounts</Menu.Item>
         }/>,
-        <Route key='detail' path="/parent/account/:accountId" component={AccountSpecificTab}/>
+        <Route key='detail' path="/parent/:section/:accountId" render={
+          (props) => <AccountSpecificTab
+            accountId={props.match.params.accountId}
+            onMissingAccount={() => props.history.replace('/parent')}
+            renderLabel={(account) => {
+              switch (props.match.params.section) {
+                case 'account':
+                  return `${account.name}'s Transactions`;
+                case 'manage':
+                  return `Manage ${account.name}'s Account`;
+                default:
+                  return null;
+              }
+            }
+            }
+          />
+        }/>
       ];
 
 
@@ -54,6 +71,8 @@ class Parents extends Component {
           <Switch>
             <Route exact path={this.props.match.url} component={Accounts}/>
             <Route exact path={`${this.props.match.url}/account/:accountId`} component={AccountDetail}/>
+            <Route exact path={`${this.props.match.url}/manage/:accountId`} component={Manage}/>
+            <Redirect to={this.props.match.url}/>
           </Switch>
         </div>
       )

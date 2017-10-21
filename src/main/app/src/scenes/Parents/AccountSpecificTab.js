@@ -1,18 +1,14 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Loader, Menu} from 'semantic-ui-react';
+import PT from 'prop-types';
 import {fetchSingleAccount} from '../../actions/accounts';
 
-/**
- * A route component.
- */
 class AccountSpecificTab extends Component {
 
   render() {
-    const accountId = this.props.match.params.accountId;
-    if (this.props.accountsById && this.props.accountsById[accountId]) {
-      const name = this.props.accountsById[accountId].name;
-      return <Menu.Item header active={true}>{name}'s Account</Menu.Item>
+    if (this.props.account) {
+      return <Menu.Item header active={true}>{this.props.renderLabel(this.props.account)}</Menu.Item>
     }
     else {
       return <Loader active inline/>
@@ -20,20 +16,34 @@ class AccountSpecificTab extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchAccount(this.props.match.params.accountId);
+    this.props.fetchAccount();
+  }
+
+  static propTypes = {
+    accountId: PT.string,
+    renderLabel: PT.func,
+    onMissingAccount: PT.func
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   return {
-    accountsById: state.accounts.byId
+    account: state.accounts.byId && state.accounts.byId[ownProps.accountId]
   }
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    fetchAccount: (accountId) => {
-      dispatch(fetchSingleAccount(accountId));
+    fetchAccount: () => {
+      dispatch(fetchSingleAccount(ownProps.accountId))
+        .then(() => {
+          },
+          (err) => {
+            if (err.status === 404) {
+              ownProps.onMissingAccount();
+            }
+          }
+        );
     }
   }
 };

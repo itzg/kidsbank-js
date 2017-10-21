@@ -121,8 +121,7 @@ public class AccountsService {
         return result.getMappedResults().get(0).getBalance();
     }
 
-    public float getKidPrimaryAccountBalance(String kidUserId) throws NotFoundException {
-
+    public String getKidPrimaryAccountId(String kidUserId) throws NotFoundException {
         final Kid kid = mongoTemplate.findById(kidUserId, Kid.class);
         //noinspection ConstantConditions
         if (kid == null) {
@@ -130,11 +129,10 @@ public class AccountsService {
         }
 
         if (kid.getAccounts().isEmpty()) {
-            log.warn("Kid account={} had no accounts", kidUserId);
-            return 0;
+            throw new NotFoundException(String.format("No accounts found for %s", kidUserId));
         }
 
-        return getBalance(kid.getAccounts().get(0));
+        return kid.getAccounts().get(0);
     }
 
     @Data

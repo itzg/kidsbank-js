@@ -12,14 +12,14 @@ import 'semantic-ui-css/semantic.min.css';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import sessionTimeoutMiddleware from './actions/sessionTimeoutMiddleware';
+import restApiMiddleware from './actions/restApiMiddleware';
 
 const loggerMiddleware = createLogger();
 
 const store = createStore(
   rootReducer,
   applyMiddleware(
-    sessionTimeoutMiddleware,
+    restApiMiddleware,
     thunkMiddleware,
     loggerMiddleware
   )

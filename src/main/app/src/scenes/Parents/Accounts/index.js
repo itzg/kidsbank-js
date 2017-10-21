@@ -35,9 +35,12 @@ class Accounts extends Component {
           onShare={(evt) => {
             evt.stopPropagation();
             this.handleShareClick(account);
-          }
-          }
+          }}
           onClick={() => this.handleAccountClick(account)}
+          onManage={(evt) => {
+            evt.stopPropagation();
+            this.handleManage(account);
+          }}
         />);
 
       listArea = (
@@ -84,6 +87,10 @@ class Accounts extends Component {
       });
   };
 
+  handleManage = (account) => {
+    this.props.history.push(`/parent/manage/${account.id}`)
+  };
+
   handleCreateSubmit = (values) => {
     return this.props.handleCreateAccount(values)
       .then(() => {
@@ -92,7 +99,6 @@ class Accounts extends Component {
   };
 
   handleAccountClick = (account) => {
-    console.log("Account clicked", account);
     this.props.history.push(`/parent/account/${account.id}`);
   }
 }

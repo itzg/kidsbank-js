@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Header, Icon, Loader, Message, Table} from 'semantic-ui-react';
+import {Button, Icon, Loader, Message, Table} from 'semantic-ui-react';
 import {
   loadInitialTransactions,
   loadNewerTransactions,
@@ -46,7 +46,7 @@ class Transactions extends Component {
       content = <Loader active/>
     }
     else if (this.props.loaded && this.props.page.totalElements === 0) {
-      content = <Message compact icon='arrow up' content='None yet. Create one above.'/>
+      content = <Message compact icon='arrow up' content='No transactions yet. Create one above.'/>
     }
     else {
 
@@ -107,7 +107,6 @@ class Transactions extends Component {
 
     return (
       <div className='Transactions'>
-        <Header>Transactions</Header>
         {content}
       </div>
     );

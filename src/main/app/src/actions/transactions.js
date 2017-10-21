@@ -1,4 +1,4 @@
-import {getJson, postJson} from './RestApi';
+import {getJson, postFile, postJson} from './RestApi';
 import {adaptValidationToSubmissionError} from "./Forms";
 import {fetchAccountBalance} from './accounts';
 
@@ -140,5 +140,55 @@ export function loadTransactionsSuccess(accountId, page) {
     type: LOAD_TRANSACTIONS_SUCCESS,
     accountId,
     page
+  }
+}
+
+const RESTORE_TRANSACTIONS_START = 'RESTORE_TRANSACTIONS_START';
+const RESTORE_TRANSACTIONS_FAILED = 'RESTORE_TRANSACTIONS_FAILED';
+const RESTORE_TRANSACTIONS_SUCCESS = 'RESTORE_TRANSACTIONS_SUCCESS';
+
+export function restoreTransactions(accountId, fileList) {
+  return (dispatch) => {
+    if (fileList == null || fileList.length === 0) {
+      dispatch(restoreTransactionsFailed(accountId, fileList, 'Empty file list'));
+      return Promise.reject();
+    }
+
+    dispatch(restoreTransactionsStart(accountId, fileList));
+
+    return postFile(`/api/parent/accounts/${accountId}/_restore`, fileList[0])
+      .then(results => {
+        dispatch(restoreTransactionsSuccess(accountId, results));
+
+        dispatch(fetchAccountBalance(accountId, true));
+        dispatch(reloadInitialTransactions(accountId));
+
+        return Promise.resolve(results);
+      })
+  }
+}
+
+export function restoreTransactionsStart(accountId, fileList) {
+  return {
+    type: RESTORE_TRANSACTIONS_START,
+    accountId,
+    fileList
+  }
+}
+
+export function restoreTransactionsFailed(accountId, fileList, reason) {
+  return {
+    type: RESTORE_TRANSACTIONS_FAILED,
+    accountId,
+    fileList,
+    reason
+  }
+}
+
+export function restoreTransactionsSuccess(accountId, results) {
+  return {
+    type: RESTORE_TRANSACTIONS_SUCCESS,
+    accountId,
+    results
   }
 }

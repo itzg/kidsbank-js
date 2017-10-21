@@ -73,6 +73,7 @@ export function fetchSingleAccountStart(accountId) {
 }
 
 export const FETCH_SINGLE_ACCOUNT_SUCCESS = 'FETCH_SINGLE_ACCOUNT_SUCCESS';
+export const FETCH_SINGLE_ACCOUNT_SKIPPED = 'FETCH_SINGLE_ACCOUNT_SKIPPED';
 
 export function fetchSingleAccountSuccess(account) {
   return {
@@ -81,22 +82,27 @@ export function fetchSingleAccountSuccess(account) {
   }
 }
 
+function fetchSingleAccountSkip(accountId) {
+  return {
+    type: FETCH_SINGLE_ACCOUNT_SKIPPED,
+    accountId
+  }
+}
+
 export function fetchSingleAccount(accountId) {
   return (dispatch, getState) => {
     const {accounts} = getState();
 
     if (accounts.byId && accounts.byId[accountId]) {
-      return;
+      dispatch(fetchSingleAccountSkip(accountId));
+      return Promise.resolve();
     }
 
     dispatch(fetchSingleAccountStart(accountId));
 
-    getJson(`/api/parent/accounts/${accountId}`)
+    return getJson(`/api/parent/accounts/${accountId}`)
       .then(json => {
-        console.log('success', json);
         dispatch(fetchSingleAccountSuccess(json))
-      }, err => {
-        console.error('failed', err);
       })
 
   }

@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {Button, Card, Message} from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+import PT from 'prop-types';
 import {fetchAccountBalance} from "../../../actions/accounts";
 import Balance from '../../../components/Balance';
 
@@ -11,6 +11,7 @@ class Account extends React.Component {
       account,
       shareCode,
       onShare,
+      onManage,
       onClick
     } = this.props;
 
@@ -26,6 +27,7 @@ class Account extends React.Component {
         {shareCode &&
         <Message info positive>Kidlink code is {shareCode}</Message>}
         <div>
+          <Button onClick={onManage}>Manage</Button>
           <Button onClick={onShare}>Share</Button>
         </div>
       </Card.Content>
@@ -37,10 +39,11 @@ class Account extends React.Component {
   }
 
   static propTypes = {
-    account: PropTypes.object,
-    shareCode: PropTypes.string,
-    onShare: PropTypes.func,
-    onClick: PropTypes.func
+    account: PT.object,
+    shareCode: PT.string,
+    onShare: PT.func,
+    onClick: PT.func,
+    onManage: PT.func
   }
 }
 

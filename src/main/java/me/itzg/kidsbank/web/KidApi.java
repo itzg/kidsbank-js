@@ -27,6 +27,8 @@ public class KidApi {
 
     @GetMapping("primary-account/balance")
     public ResponseValue<Float> getPrimaryAccountBalance(Principal principal) throws NotFoundException {
-        return new ResponseValue<>(accountsService.getKidPrimaryAccountBalance(principal.getName()));
+        final String accountId = accountsService.getKidPrimaryAccountId(principal.getName());
+
+        return new ResponseValue<>(accountsService.getBalance(accountId));
     }
 }

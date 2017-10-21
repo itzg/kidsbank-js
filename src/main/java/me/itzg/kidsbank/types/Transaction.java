@@ -33,4 +33,11 @@ public class Transaction {
     String description;
 
     float amount;
+
+    CreationType creationType = CreationType.NORMAL;
+
+    public static enum CreationType {
+        NORMAL,
+        RESTORE
+    }
 }

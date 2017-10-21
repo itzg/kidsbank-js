@@ -1,6 +1,28 @@
 import BackendError from '../types/BackendError';
 
 /**
+ * Used as the <code>.then</code> handler of the fetch.
+ *
+ * @param response
+ * @returns {Promise<Object>} that is resolved when the HTTP response is ok (2xx) or rejected with
+ *   a {@link BackendError}.
+ */
+function handleResponse(response) {
+  if (!response.ok) {
+    return response.json().then(content => {
+      return Promise.reject(new BackendError(content, response));
+    })
+  }
+  else {
+    if (response.headers.get('Content-Length') === '0' || !response.headers.has('Content-Type')) {
+      return Promise.resolve('');
+    }
+
+    return response.json();
+  }
+}
+
+/**
  * Performs a fetch-get with the appropriate credentials enabled. It also pre-fetches the JSON
  * body of the response and resolves/rejects the promise with that content.
  *
@@ -9,18 +31,7 @@ import BackendError from '../types/BackendError';
  *   a {@link BackendError}.
  */
 export function getJson(path) {
-  return fetch(path, {credentials: 'same-origin'}).then(
-    (response) => {
-      if (!response.ok) {
-        return response.json().then(content => {
-          return Promise.reject(new BackendError(content, response));
-        })
-      }
-      else {
-        return response.json();
-      }
-    }
-  )
+  return fetch(path, {credentials: 'same-origin'}).then(handleResponse);
 }
 
 /**
@@ -50,17 +61,25 @@ export function postJson(path, obj) {
     headers,
     body,
     credentials: 'same-origin'
-  }).then(
-    (response) => {
-      if (!response.ok) {
-        return response.json()
-          .then(json => {
-            return Promise.reject(new BackendError(json, response));
-          })
-      }
-      else {
-        return response.json();
-      }
-    }
-  )
+  }).then(handleResponse);
+}
+
+/**
+ * Posts a multi-part form content to the given path.
+ * @param path the backend API path
+ * @param file {File} a Web API {@link File} object, such as from a {@link FileList}. This will be posted as 'file' in the form data.
+ */
+export function postFile(path, file) {
+  const headers = new Headers();
+  // headers.append('Content-Type', 'multipart/form-data');
+
+  let formData = new FormData();
+  formData.append('file', file);
+
+  return fetch(path, {
+    method: 'POST',
+    headers,
+    body: formData,
+    credentials: 'same-origin'
+  }).then(handleResponse);
 }

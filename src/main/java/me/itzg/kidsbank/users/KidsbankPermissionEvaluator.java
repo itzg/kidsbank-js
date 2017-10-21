@@ -1,5 +1,6 @@
 package me.itzg.kidsbank.users;
 
+import me.itzg.kidsbank.types.Kid;
 import me.itzg.kidsbank.types.Parent;
 import me.itzg.kidsbank.types.Permissions;
 import me.itzg.kidsbank.types.Types;
@@ -41,25 +42,28 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
                                  String targetType,
                                  Object permission) {
 
+        final boolean isParent = isParentAuthentication(authentication);
         final String userId = authentication.getName();
 
         switch (targetType) {
             case Types.ACCOUNT:
 
+                final String accountId = targetId.toString();
+
                 switch (permission.toString()) {
                     case Permissions.SHARE:
-                        return parentHasAccount(userId, targetId.toString());
+                        return parentHasAccount(userId, accountId);
 
                     case Permissions.VIEW:
-                        //TODO kids can also view their specific account
-                        return parentHasAccount(userId, targetId.toString());
+                        return (isParent && parentHasAccount(userId, accountId)) ||
+                                kidHasAccount(userId, accountId);
 
                     case Permissions.READ_ENTRIES:
-                        //TODO kids can also view their specific account
-                        return parentHasAccount(userId, targetId.toString());
+                        return (isParent && parentHasAccount(userId, accountId)) ||
+                                kidHasAccount(userId, accountId);
 
                     case Permissions.MODIFY_ENTRIES:
-                        return parentHasAccount(userId, targetId.toString());
+                        return parentHasAccount(userId, accountId);
 
                 }
 
@@ -67,6 +71,19 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
         }
 
         return false;
+    }
+
+    private boolean kidHasAccount(String userId, String accountId) {
+        final Query query = Query.query(
+                Criteria.where("_id").is(userId)
+                        .and(Kid.FIELD_ACCOUNTS).is(accountId)
+        );
+
+        return mongoTemplate.exists(query, Kid.class);
+    }
+
+    private boolean isParentAuthentication(Authentication authentication) {
+        return authentication.getAuthorities().contains(Authorities.PARENT_AUTHORITY);
     }
 
     private boolean parentHasAccount(String parentUserId, String accountId) {

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {logoutUser} from '../actions/user';
 import NotificationSystem from 'react-notification-system';
+import {removePendingNotifications} from "../actions/notifications";
 
 class Notifications extends Component {
   _notificationSystem = null;
@@ -25,22 +26,35 @@ class Notifications extends Component {
         }
       });
     }
+
+    if (nextProps.notifications.pending.length > 0) {
+      for (let notification of nextProps.notifications.pending) {
+        this._notificationSystem.addNotification(notification);
+      }
+
+      this.props.removeNotifications(nextProps.notifications.pending);
+    }
   }
 
 }
 
 function mapStateToProps(state) {
-  const {session} = state;
+  const {session, notifications} = state;
 
   return {
-    session
+    session,
+    notifications
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    onLogout: () => {
+    onLogout() {
       dispatch(logoutUser());
+    },
+
+    removeNotifications(notifications) {
+      dispatch(removePendingNotifications(notifications));
     }
   }
 }
