@@ -71,7 +71,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(Paths.ROOT)
                 .antMatchers("/index.html")
-                .antMatchers("/js/**");
+                .antMatchers("/favicon.ico")
+                .antMatchers("/static/**")
+                .antMatchers("/*.json")
+                .antMatchers("/*.js");
     }
 
     @Override

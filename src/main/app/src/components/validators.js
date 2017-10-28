@@ -10,3 +10,6 @@ export const maxLength = max => value =>
 
 export const number = value =>
   value && isNaN(Number(value)) ? 'Must be a number' : undefined;
+
+export const greaterThanZero = value =>
+  value && isNaN(Number(value)) && value > 0 ? 'Must be 1 or greater' : undefined;

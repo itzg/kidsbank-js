@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.util.Date;
 
 /**
@@ -19,17 +20,21 @@ public class Transaction {
     public static final String FIELD_WHEN = "when";
     public static final String FIELD_AMOUNT = "amount";
 
+    @Null(groups = ForCreate.class)
+    @NotEmpty(groups = ForSave.class)
     @Id
     String id;
 
+    @NotEmpty(groups = ForSave.class)
     String accountId;
 
     String createdBy;
+    String modifiedBy;
 
-    @NotNull
+    @NotNull(groups = {ForCreate.class, ForSave.class})
     Date when;
 
-    @NotEmpty
+    @NotEmpty(groups = {ForCreate.class, ForSave.class})
     String description;
 
     float amount;
@@ -38,6 +43,7 @@ public class Transaction {
 
     public static enum CreationType {
         NORMAL,
-        RESTORE
+        RESTORE,
+        SCHEDULED
     }
 }

@@ -6,12 +6,14 @@ import {
   loadInitialTransactions,
   loadNewerTransactions,
   loadOlderTransactions,
-  reloadInitialTransactions
-} from "../../../../actions/transactions";
+  reloadInitialTransactions,
+  selectTransaction
+} from "../../../actions/transactions";
 import moment from 'moment';
-import {formatCurrency} from '../../../../components/locale';
-import './index.css';
-import {fetchAccountBalance} from "../../../../actions/accounts";
+import {formatCurrency} from '../../../components/locale';
+import './Transactions.css';
+import {fetchAccountBalance} from "../../../actions/accounts";
+import EditTransactionModal from './EditTransactionModal';
 
 function IncomeCell(props) {
   if (props.amount < 0) {
@@ -27,18 +29,27 @@ function ExpenseCell(props) {
   return <Table.Cell negative><Icon name='minus'/> {formatCurrency(props.amount * -1)}</Table.Cell>;
 }
 
-class Transactions extends Component {
+function formatDate(date) {
+  return moment(date).calendar(null, {
+    sameDay: '[Today]',
+    nextDay: '[Tomorrow]',
+    nextWeek: 'dddd',
+    lastDay: '[Yesterday]',
+    lastWeek: '[Last] dddd',
+    sameElse: 'MM/DD/YYYY'
+  });
+}
 
-  static formatDate(date) {
-    return moment(date).calendar(null, {
-      sameDay: '[Today]',
-      nextDay: '[Tomorrow]',
-      nextWeek: 'dddd',
-      lastDay: '[Yesterday]',
-      lastWeek: '[Last] dddd',
-      sameElse: 'MM/DD/YYYY'
-    });
-  }
+class Transactions extends Component {
+  state = {
+    selected: null
+  };
+
+  select = (target) => {
+    this.setState(prevState => ({
+      selected: target === prevState.selected ? null : target
+    }));
+  };
 
   render() {
     let content;
@@ -59,8 +70,11 @@ class Transactions extends Component {
         </Table.Row>;
       }
       else {
-        tableBody = this.props.page.content.map(t => <Table.Row key={t.id}>
-          <Table.Cell>{Transactions.formatDate(t.when)}</Table.Cell>
+        tableBody = this.props.page.content.map(t => <Table.Row key={t.id}
+                                                                onClick={() => this.select(t)}
+                                                                active={t === this.state.selected}
+        >
+          <Table.Cell>{formatDate(t.when)}</Table.Cell>
           <Table.Cell>{t.description}</Table.Cell>
           <IncomeCell amount={t.amount}/>
           <ExpenseCell amount={t.amount}/>
@@ -68,7 +82,7 @@ class Transactions extends Component {
       }
 
       content = (
-        <Table>
+        <Table selectable>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell width={2}>Date</Table.HeaderCell>
@@ -90,8 +104,9 @@ class Transactions extends Component {
                   {!this.props.page.first &&
                   <Button content='Newer' icon='left chevron' labelPosition='left'
                           onClick={this.props.loadNewerTransactions} className='newer'/>}
-                  <div className='reload'>
+                  <div className='actions'>
                     <Button content='Reload' icon='refresh' onClick={this.props.reloadTransactions}/>
+                    <EditTransactionModal transaction={this.state.selected}/>
                   </div>
                   {!this.props.page.last &&
                   <Button content='Older' icon='right chevron' labelPosition='right'
@@ -116,6 +131,10 @@ class Transactions extends Component {
     this.props.loadInitialTransactions();
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({selected: null})
+  }
+
   static propTypes = {
     accountId: PropTypes.string
   }
@@ -127,7 +146,8 @@ function mapStateToProps(state, ownProps) {
     return {
       page,
       loading,
-      loaded
+      loaded,
+      selectedTransaction: state.transactions.selected
     };
   } else {
     return {
@@ -144,7 +164,7 @@ function mapDispatchToProps(dispatch, ownProps) {
 
     reloadTransactions() {
       dispatch(reloadInitialTransactions(ownProps.accountId));
-      dispatch(fetchAccountBalance(ownProps.accounts, true));
+      dispatch(fetchAccountBalance(ownProps.accountId, true));
     },
 
     loadOlderTransactions() {
@@ -153,6 +173,10 @@ function mapDispatchToProps(dispatch, ownProps) {
 
     loadNewerTransactions() {
       dispatch(loadNewerTransactions(ownProps.accountId));
+    },
+
+    select(transaction) {
+      dispatch(selectTransaction(transaction));
     }
   }
 }

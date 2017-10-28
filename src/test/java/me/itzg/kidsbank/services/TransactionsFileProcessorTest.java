@@ -43,4 +43,48 @@ public class TransactionsFileProcessorTest {
             assertEquals(-3.45f, transactions.get(11).getAmount(), 0.001);
         }
     }
+
+    @Test
+    public void testJustHeaderFile() throws IOException, InvalidFormatException {
+        final ClassPathResource resource = new ClassPathResource("just-header-transactions.xlsx");
+        try (InputStream inputStream = resource.getInputStream()) {
+            final MockMultipartFile multipartFile = new MockMultipartFile("just-header-transactions.xlsx",
+                                                                          "just-header-transactions.xlsx",
+                                                                          ExtendedContentTypes.XLSX,
+                                                                          inputStream);
+
+            final TransactionsFileProcessor processor = new TransactionsFileProcessor();
+            final List<Transaction> transactions = processor.process(multipartFile);
+            assertThat(transactions, Matchers.hasSize(0));
+        }
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEmptySheet() throws IOException, InvalidFormatException {
+        final ClassPathResource resource = new ClassPathResource("empty-sheet.xlsx");
+        try (InputStream inputStream = resource.getInputStream()) {
+            final MockMultipartFile multipartFile = new MockMultipartFile("empty-sheet.xlsx",
+                                                                          "empty-sheet.xlsx",
+                                                                          ExtendedContentTypes.XLSX,
+                                                                          inputStream);
+
+            final TransactionsFileProcessor processor = new TransactionsFileProcessor();
+            final List<Transaction> transactions = processor.process(multipartFile);
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMissingDateColumn() throws IOException, InvalidFormatException {
+        final ClassPathResource resource = new ClassPathResource("missing-date-column.xlsx");
+        try (InputStream inputStream = resource.getInputStream()) {
+            final MockMultipartFile multipartFile = new MockMultipartFile("missing-date-column.xlsx",
+                                                                          "missing-date-column.xlsx",
+                                                                          ExtendedContentTypes.XLSX,
+                                                                          inputStream);
+
+            final TransactionsFileProcessor processor = new TransactionsFileProcessor();
+            final List<Transaction> transactions = processor.process(multipartFile);
+        }
+    }
 }

@@ -1,12 +1,19 @@
-import {LOAD_TRANSACTIONS_START, LOAD_TRANSACTIONS_SUCCESS} from "../actions/transactions";
+import {
+  DESELECT_TRANSACTION,
+  LOAD_TRANSACTIONS_START,
+  LOAD_TRANSACTIONS_SUCCESS,
+  SELECT_TRANSACTION
+} from "../actions/transactions";
 
 export default function transactions(state = {
-                                       byAccount: {}
+                                       byAccount: {},
+                                       selected: null
                                      },
                                      action) {
   switch (action.type) {
     case LOAD_TRANSACTIONS_START:
       return {
+        ...state,
         byAccount: {
           ...state.byAccount,
 
@@ -19,6 +26,7 @@ export default function transactions(state = {
 
     case LOAD_TRANSACTIONS_SUCCESS:
       return {
+        ...state,
         byAccount: {
           ...state.byAccount,
 
@@ -29,6 +37,18 @@ export default function transactions(state = {
             loading: false
           }
         }
+      };
+
+    case SELECT_TRANSACTION:
+      return {
+        ...state,
+        selected: action.transaction
+      };
+
+    case DESELECT_TRANSACTION:
+      return {
+        ...state,
+        selected: null
       };
 
     default:

@@ -16,9 +16,9 @@ class Backup extends Component {
 
   render() {
     return <div className='Backup'>
-      <Button onClick={this.handleClick} loading={this.state.downloading}>Backup</Button>
+      <Button onClick={this.handleClick} loading={this.state.downloading}>Export</Button>
       <Downloader download={this.state.clicked}
-                  location={`/api/parent/accounts/${this.props.accountId}/backup.xlsx`}
+                  location={`/api/parent/accounts/${this.props.accountId}/export.xlsx`}
                   onWillDownload={this.handleWillDownload}
                   onDidDownload={this.handleDidDownload}
       />

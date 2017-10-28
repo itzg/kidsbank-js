@@ -6,4 +6,6 @@ package me.itzg.kidsbank.types;
  */
 public class Types {
     public static final String ACCOUNT = "Account";
+    public static final String SCHEDULED_TRANSACTION = "ScheduledTransaction";
+    public static final String TRANSACTION = "Transaction";
 }

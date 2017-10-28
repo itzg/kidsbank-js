@@ -2,10 +2,10 @@
     margin: var(--scene-margin);
 }
 
-.ParentsManage .BackupRestore button {
+.ParentsManage .BackupRestoreSegment button {
     min-width: 10em;
 }
 
-.ParentsManage .BackupRestore div.Backup {
+.ParentsManage .BackupRestoreSegment div.Backup {
     margin-bottom: 5px;
 }

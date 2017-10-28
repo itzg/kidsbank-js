@@ -3,6 +3,8 @@ package me.itzg.kidsbank.users;
 import me.itzg.kidsbank.types.Kid;
 import me.itzg.kidsbank.types.Parent;
 import me.itzg.kidsbank.types.Permissions;
+import me.itzg.kidsbank.types.ScheduledTransaction;
+import me.itzg.kidsbank.types.Transaction;
 import me.itzg.kidsbank.types.Types;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -52,7 +54,7 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
 
                 switch (permission.toString()) {
                     case Permissions.SHARE:
-                        return parentHasAccount(userId, accountId);
+                        return isParent && parentHasAccount(userId, accountId);
 
                     case Permissions.VIEW:
                         return (isParent && parentHasAccount(userId, accountId)) ||
@@ -63,8 +65,27 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
                                 kidHasAccount(userId, accountId);
 
                     case Permissions.MODIFY_ENTRIES:
-                        return parentHasAccount(userId, accountId);
+                        return isParent && parentHasAccount(userId, accountId);
 
+                    default:
+                        return false;
+                }
+
+            case Types.SCHEDULED_TRANSACTION:
+                final String scheduledId = targetId.toString();
+
+                switch (permission.toString()) {
+                    case Permissions.DELETE:
+                        return isParent && parentHasAccount(userId, getAccountOfScheduled(scheduledId));
+                }
+                break;
+
+            case Types.TRANSACTION:
+                final String transactionId = targetId.toString();
+
+                switch (permission.toString()) {
+                    case Permissions.DELETE:
+                        return isParent && parentHasAccount(userId, getAccountOfTransaction(transactionId));
                 }
 
                 break;
@@ -73,7 +94,35 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
         return false;
     }
 
+    private String getAccountOfScheduled(String scheduledId) {
+        final ScheduledTransaction scheduledTransaction =
+                mongoTemplate.findById(scheduledId, ScheduledTransaction.class);
+
+        //noinspection ConstantConditions
+        if (scheduledTransaction == null) {
+            return null;
+        }
+
+        return scheduledTransaction.getAccountId();
+    }
+
+    private String getAccountOfTransaction(String transactionId) {
+        final Transaction transaction =
+                mongoTemplate.findById(transactionId, Transaction.class);
+
+        //noinspection ConstantConditions
+        if (transaction == null) {
+            return null;
+        }
+
+        return transaction.getAccountId();
+    }
+
     private boolean kidHasAccount(String userId, String accountId) {
+        if (accountId == null) {
+            return false;
+        }
+
         final Query query = Query.query(
                 Criteria.where("_id").is(userId)
                         .and(Kid.FIELD_ACCOUNTS).is(accountId)
@@ -87,6 +136,10 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
     }
 
     private boolean parentHasAccount(String parentUserId, String accountId) {
+        if (accountId == null) {
+            return false;
+        }
+
         final Query query = Query.query(Criteria.where("_id").is(parentUserId)
                                                 .and("accounts").is(accountId));
 

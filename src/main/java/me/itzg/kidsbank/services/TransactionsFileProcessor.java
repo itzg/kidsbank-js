@@ -47,8 +47,8 @@ public class TransactionsFileProcessor {
 
         final Sheet sheet = wb.getSheetAt(0);
         final int lastRowNum = sheet.getLastRowNum();
-        if (lastRowNum == 0) {
-            throw new IllegalArgumentException("Requires at least a header row of Date, Description, Ammount");
+        if (lastRowNum < 0) {
+            throw new IllegalArgumentException("Requires at least a header row of Date, Description, Amount");
         }
 
         int dateCol = -1;
@@ -56,6 +56,10 @@ public class TransactionsFileProcessor {
         int amountCol = -1;
 
         final Row headerRow = sheet.getRow(0);
+        if (headerRow == null) {
+            throw new IllegalArgumentException("Requires at least a header row of Date, Description, Amount");
+        }
+
         for (int c = headerRow.getFirstCellNum(); c < headerRow.getLastCellNum(); ++c) {
             final Cell cell = headerRow.getCell(c);
             if (cell.getStringCellValue().toLowerCase().equals("date")) {

@@ -1,20 +1,26 @@
 import React from 'react';
-import {connect} from 'react-redux';
 import {Header, Segment} from 'semantic-ui-react';
+import {connect} from "react-redux";
 
 import './index.css';
+import Export from './Export';
+import Import from './Import';
+import ScheduledTransactions from './ScheduledTranactions';
 import {fetchSingleAccount} from "../../../actions/accounts";
-import Backup from './Backup';
-import Restore from './Restore';
 
 class Manage extends React.Component {
   render() {
     return <div className='ParentsManage'>
 
-      <Segment className='BackupRestore'>
-        <Header>Backup/Restore all transactions</Header>
-        <Backup accountId={this.accountId()}/>
-        <Restore accountId={this.accountId()}/>
+      <Segment className='BackupRestoreSegment'>
+        <Header>Export/Import transactions</Header>
+        <Export accountId={this.accountId()}/>
+        <Import accountId={this.accountId()}/>
+      </Segment>
+
+      <Segment className='ScheduledTransactionsSegment'>
+        <Header>Scheduled Transactions</Header>
+        <ScheduledTransactions accountId={this.accountId()}/>
       </Segment>
     </div>
   }

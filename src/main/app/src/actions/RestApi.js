@@ -46,22 +46,46 @@ export function get(path) {
 /**
  * Performs a fetch-post taking the given body and converting it into a JSON payload of the POST.
  * @param path
- * @param body
+ * @param obj
  * @returns {Promise<Object>} a promise resolved with the JSON content of the response or rejected
  * with a {@link BackendError}.
  */
 export function postJson(path, obj) {
+  return sendJson('POST', path, obj)
+}
+
+/**
+ * Performs a fetch-put taking the given body and converting it into a JSON payload of the PUT.
+ * @param path
+ * @param obj
+ * @returns {Promise<Object>} a promise resolved with the JSON content of the response or rejected
+ * with a {@link BackendError}.
+ */
+export function putJson(path, obj) {
+  return sendJson('PUT', path, obj);
+}
+
+/**
+ * Performs a fetch taking the given body and converting it into a JSON payload of the request.
+ * @param method usually either 'POST' or 'PUT'
+ * @param path
+ * @param obj
+ * @returns {Promise<Object>} a promise resolved with the JSON content of the response or rejected
+ * with a {@link BackendError}.
+ */
+export function sendJson(method, path, obj) {
   const body = JSON.stringify(obj);
 
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
 
   return fetch(path, {
-    method: 'POST',
+    method,
     headers,
     body,
     credentials: 'same-origin'
   }).then(handleResponse);
+
 }
 
 /**
@@ -80,6 +104,16 @@ export function postFile(path, file) {
     method: 'POST',
     headers,
     body: formData,
+    credentials: 'same-origin'
+  }).then(handleResponse);
+}
+
+export function deleteThenJson(path) {
+  const headers = new Headers();
+
+  return fetch(path, {
+    method: 'DELETE',
+    headers,
     credentials: 'same-origin'
   }).then(handleResponse);
 }

@@ -1,13 +1,18 @@
 import React from 'react';
 import {Form, Label} from 'semantic-ui-react';
-import './ValidatedFormField.css';
+import PropTypes from 'prop-types';
+// eslint-disable-next-line
+import {Field} from "redux-form";
 
 /**
- * This is intended to be used as the component property of a redux-form Field. The <code>control</code> prop is
- * passed into the contained Form.Field, so the shorthands such as Form.Input aren't used here.
+ * This is a {@link Form.Field} that is intended to be used as the <code>component</code> property of a redux-form {@link Field}.
+ * The <code>control</code> property is passed into the contained {@link Form.Field} and
+ * <code>controlProps</code> in turn is passed to the created <code>control</code> element as its props.
  *
  * <code>
- *     &lt;Field name='name' component={ValidatedFormField} control={Input} required label='Account/Child Name'/&gt;
+ *     import {Field as ReduxField} from 'redux-form';
+ *     ...
+ *     &lt;ReduxField name='name' label='Name' component={ValidatedFormField} control={Input}/&gt;
  * </code>
  *
  * @param props
@@ -15,14 +20,22 @@ import './ValidatedFormField.css';
  * @constructor
  */
 const ValidatedFormField = props => {
-  const {meta} = props;
+  const {meta, input, label, control} = props;
   return (
-    <div className='ValidatedFormField'>
-      <Form.Field {...props} error={meta.invalid}/>
-      {meta.warning && <Label basic color='orange' pointing>{meta.warning}</Label>}
-      {meta.invalid && <Label basic color='red' pointing>{meta.error}</Label>}
-    </div>
+    <Form.Field error={meta.invalid && meta.dirty} width={props.width}>
+      {label && <label>{label}</label>}
+      {control && React.createElement(control, {...input, ...props.controlProps})}
+      {meta.warning && meta.dirty && <Label basic color='orange' pointing>{meta.warning}</Label>}
+      {meta.invalid && meta.dirty && <Label basic color='red' pointing>{meta.error}</Label>}
+    </Form.Field>
   );
+};
+
+ValidatedFormField.propTypes = {
+  label: Form.Field.propTypes.label,
+  control: Form.Field.propTypes.control,
+  controlProps: PropTypes.object,
+  width: Form.Field.propTypes.width
 };
 
 export default ValidatedFormField;

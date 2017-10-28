@@ -3,7 +3,7 @@ import {Button} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import FileInput from '../../../components/FileInput';
-import {restoreTransactions} from "../../../actions/transactions";
+import {importTransactions} from "../../../actions/transactions";
 import {createNotification} from "../../../actions/notifications";
 
 class Restore extends Component {
@@ -20,7 +20,7 @@ class Restore extends Component {
     return <div className='Restore'>
       <Button disabled={this.state.fileList.length === 0}
               onClick={this.handleImport}
-      >Restore</Button>
+      >Import</Button>
       <FileInput onChange={this.handleFileInputChange} fileList={this.state.fileList}/>
     </div>
   }
@@ -32,7 +32,7 @@ class Restore extends Component {
   };
 
   handleImport = () => {
-    this.props.dispatch(restoreTransactions(this.props.accountId, this.state.fileList))
+    this.props.dispatch(importTransactions(this.props.accountId, this.state.fileList))
       .then(results => {
         this.setState({fileList: []})
         this.props.dispatch(createNotification(`Restored ${results.processed} transactions`));

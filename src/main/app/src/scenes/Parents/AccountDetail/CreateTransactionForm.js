@@ -1,50 +1,37 @@
 import React from 'react';
-import {Field, reduxForm} from 'redux-form';
-import {Form, Input} from 'semantic-ui-react';
-import DatePicker from 'react-datepicker';
+import {Field as ReduxField, reduxForm} from 'redux-form';
+import {Form, Input, Segment} from 'semantic-ui-react';
 import {Prompt} from 'react-router-dom';
-import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import {nonEmpty, number, required} from '../../../components/validators';
-
-function DatePickerField(props) {
-  let {input} = props;
-
-  return <Form.Field control={DatePicker} label={props.label} selected={input.value} onChange={input.onChange}/>
-}
-
-function MoneyField(props) {
-  let {input} = props;
-  return (
-    <Form.Field width={props.width}>
-      <label>{props.label}</label>
-      <Input label='$' value={input.value} onChange={input.onChange}/>
-    </Form.Field>
-  );
-}
+import MoneyField from "../../../components/MoneyField";
+import DatePickerField from "../../../components/DatePickerField";
+import ValidatedFormField from "../../../components/ValidatedFormField";
 
 function CreateTransactionForm(props) {
   const promptMsg = props.sessionTimeout ? "Your login session has expired. Login again now?" :
     "You have unsaved changes. Navigate anyway?";
 
   return (
-    <Form onSubmit={props.handleSubmit}>
+    <Segment secondary><Form onSubmit={props.handleSubmit}>
       <Prompt when={props.dirty} message={promptMsg}/>
       <Form.Group>
-        <Field name='when' component={DatePickerField} validate={required} label='Date' width={4}/>
-        <Field name='description' component={Form.Input} validate={[required, nonEmpty]} label='Description' width={6}/>
-        <Field name='income'
-               component={MoneyField} validate={number}
-               label='Income' width={2}/>
-        <Field name='expense'
-               component={MoneyField} validate={number}
-               label='Expense' width={2}/>
+        <ReduxField name='when' component={DatePickerField} validate={required} label='Date' width={4}/>
+        <ReduxField name='description' component={ValidatedFormField} control={Input} validate={[required, nonEmpty]}
+                    label='Description'
+                    width={6}/>
+        <ReduxField name='income' label='Income'
+                    component={MoneyField} control={MoneyField} validate={number}
+                    width={2}/>
+        <ReduxField name='expense' label='Expense'
+                    component={MoneyField} validate={number}
+                    width={2}/>
       </Form.Group>
       <Form.Group>
         <Form.Button type='submit' primary disabled={props.invalid} loading={props.submitting}>Create</Form.Button>
         <Form.Button onClick={props.onClose}>Cancel</Form.Button>
       </Form.Group>
-    </Form>
+    </Form></Segment>
   );
 }
 
@@ -60,15 +47,17 @@ function validate(values, props) {
 }
 
 function onSubmit(values, dispatch, props) {
-  props.onCreate(values.when.toDate(), values.description, (values.income || 0) - (values.expense || 0))
-    .then(props.onClose);
+  return props.onCreate(values.when, values.description, (values.income || 0) - (values.expense || 0));
 }
 
 export default reduxForm({
   form: 'createTransaction',
   validate,
   initialValues: {
-    when: moment()
+    when: new Date()
   },
-  onSubmit
+  onSubmit,
+  onSubmitSuccess(result, dispatch, props) {
+    props.onClose();
+  }
 })(CreateTransactionForm)

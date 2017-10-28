@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {fetchUserProfile, logoutUser} from '../../actions/user';
-import {Dropdown, Image, Loader, Menu} from 'semantic-ui-react';
+import {Dropdown, Image, Loader, Menu, Responsive} from 'semantic-ui-react';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import KidsbankLogo from '../../components/KidsbankLogo'
 import Accounts from './Accounts';
@@ -26,12 +26,14 @@ class Parents extends Component {
       const profileHeader = (
         <div>
           <Image src={this.props.profile.profileImageUrl} avatar/>
-          {this.props.profile.displayName}
+          <Responsive as='span' {...Responsive.onlyComputer}>
+            {this.props.profile.displayName}
+          </Responsive>
         </div>
       );
 
       const accountsTab = [
-        <Route key='top' path="/parent" render={(props) =>
+        <Responsive {...Responsive.onlyComputer} as={Route} key='top' path="/parent" render={(props) =>
           <Menu.Item as={Link} to="/parent" active={props.match.isExact}>Accounts</Menu.Item>
         }/>,
         <Route key='detail' path="/parent/:section/:accountId" render={
@@ -53,12 +55,12 @@ class Parents extends Component {
         }/>
       ];
 
-
       return (
         <div className="Parents">
           <Menu attached='top' pointing>
             <Menu.Item as={Link} to="/parent" header><KidsbankLogo size='small'/></Menu.Item>
             {accountsTab}
+
             <Menu.Menu position='right'>
               <Dropdown item trigger={profileHeader}>
                 <Dropdown.Menu>

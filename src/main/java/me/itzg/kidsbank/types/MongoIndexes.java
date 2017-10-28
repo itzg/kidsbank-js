@@ -42,5 +42,9 @@ public class MongoIndexes {
                 .ensureIndex(new Index()
                                      .on(Transaction.FIELD_ACCOUNT_ID, Sort.Direction.ASC)
                                      .on(Transaction.FIELD_WHEN, Sort.Direction.DESC));
+
+        mongoTemplate.indexOps(ScheduledTransaction.class)
+                .ensureIndex(new Index()
+                                     .on(ScheduledTransaction.FIELD_ACCOUNT_ID, Sort.Direction.ASC));
     }
 }

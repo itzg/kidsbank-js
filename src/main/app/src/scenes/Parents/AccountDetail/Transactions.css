@@ -11,7 +11,7 @@
     order: 1;
 }
 
-.Transactions .navigate > .reload {
+.Transactions .navigate > .actions {
     order: 0;
     flex-grow: 1;
     text-align: left;

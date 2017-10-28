@@ -1,4 +1,4 @@
-import {getJson, postFile, postJson} from './RestApi';
+import {deleteThenJson, getJson, postFile, postJson, putJson} from './RestApi';
 import {adaptValidationToSubmissionError} from "./Forms";
 import {fetchAccountBalance} from './accounts';
 
@@ -44,8 +44,62 @@ export function createTransaction(accountId, when, description, amount) {
 
         dispatch(fetchAccountBalance(accountId, true));
 
-        return Promise.resolve();
       }, adaptValidationToSubmissionError);
+  }
+}
+
+const SAVE_TRANSACTION_START = 'SAVE_TRANSACTION_START';
+const SAVE_TRANSACTION_SUCCESS = 'SAVE_TRANSACTION_SUCCESS';
+
+export function saveTransaction(values) {
+  return (dispatch) => {
+    dispatch({
+      type: SAVE_TRANSACTION_START,
+      transaction: values
+    });
+
+    let {id, accountId, description, amount, when} = values;
+
+    return putJson(`/api/parent/transactions`, {
+      id,
+      accountId,
+      description,
+      amount,
+      when
+    })
+      .then(json => {
+
+        dispatch({
+          type: SAVE_TRANSACTION_SUCCESS,
+          transaction: json
+        });
+
+        dispatch(reloadInitialTransactions(accountId));
+        dispatch(fetchAccountBalance(accountId, true));
+      }, adaptValidationToSubmissionError)
+  }
+}
+
+const DELETE_TRANSACTION_START = 'DELETE_TRANSACTION_START';
+const DELETE_TRANSACTION_SUCCESS = 'DELETE_TRANSACTION_SUCCESS';
+
+export function deleteTransaction(transactionId, accountId) {
+  return (dispatch) => {
+    dispatch({
+      type: DELETE_TRANSACTION_START,
+      transactionId
+    });
+
+    return deleteThenJson(`/api/parent/transactions/${transactionId}`)
+      .then(json => {
+        dispatch({
+          type: DELETE_TRANSACTION_SUCCESS,
+          transactionId
+        });
+
+        dispatch(reloadInitialTransactions(accountId));
+        dispatch(fetchAccountBalance(accountId, true));
+      })
   }
 }
 
@@ -80,6 +134,7 @@ export function loadPageOfTransactions(accountId, pageNumber, pageSize) {
 
     return getJson(`/api/parent/accounts/${accountId}/transactions?page=${pageNumber}&size=${pageSize}`)
       .then(json => {
+        dispatch(deselectTransaction());
         dispatch(loadTransactionsSuccess(accountId, json));
       })
 
@@ -143,52 +198,69 @@ export function loadTransactionsSuccess(accountId, page) {
   }
 }
 
-const RESTORE_TRANSACTIONS_START = 'RESTORE_TRANSACTIONS_START';
-const RESTORE_TRANSACTIONS_FAILED = 'RESTORE_TRANSACTIONS_FAILED';
-const RESTORE_TRANSACTIONS_SUCCESS = 'RESTORE_TRANSACTIONS_SUCCESS';
+const IMPORT_TRANSACTIONS_START = 'IMPORT_TRANSACTIONS_START';
+const IMPORT_TRANSACTIONS_FAILED = 'IMPORT_TRANSACTIONS_FAILED';
+const IMPORT_TRANSACTIONS_SUCCESS = 'IMPORT_TRANSACTIONS_SUCCESS';
 
-export function restoreTransactions(accountId, fileList) {
+export function importTransactions(accountId, fileList) {
   return (dispatch) => {
     if (fileList == null || fileList.length === 0) {
-      dispatch(restoreTransactionsFailed(accountId, fileList, 'Empty file list'));
+      dispatch(importTransactionsFailed(accountId, fileList, 'Empty file list'));
       return Promise.reject();
     }
 
-    dispatch(restoreTransactionsStart(accountId, fileList));
+    dispatch(importTransactionsStart(accountId, fileList));
 
-    return postFile(`/api/parent/accounts/${accountId}/_restore`, fileList[0])
+    return postFile(`/api/parent/accounts/${accountId}/_import`, fileList[0])
       .then(results => {
-        dispatch(restoreTransactionsSuccess(accountId, results));
+        dispatch(importTransactionsSuccess(accountId, results));
 
         dispatch(fetchAccountBalance(accountId, true));
         dispatch(reloadInitialTransactions(accountId));
+        dispatch(deselectTransaction());
 
         return Promise.resolve(results);
       })
   }
 }
 
-export function restoreTransactionsStart(accountId, fileList) {
+export function importTransactionsStart(accountId, fileList) {
   return {
-    type: RESTORE_TRANSACTIONS_START,
+    type: IMPORT_TRANSACTIONS_START,
     accountId,
     fileList
   }
 }
 
-export function restoreTransactionsFailed(accountId, fileList, reason) {
+export function importTransactionsFailed(accountId, fileList, reason) {
   return {
-    type: RESTORE_TRANSACTIONS_FAILED,
+    type: IMPORT_TRANSACTIONS_FAILED,
     accountId,
     fileList,
     reason
   }
 }
 
-export function restoreTransactionsSuccess(accountId, results) {
+export function importTransactionsSuccess(accountId, results) {
   return {
-    type: RESTORE_TRANSACTIONS_SUCCESS,
+    type: IMPORT_TRANSACTIONS_SUCCESS,
     accountId,
     results
+  }
+}
+
+export const SELECT_TRANSACTION = 'SELECT_TRANSACTION';
+export const DESELECT_TRANSACTION = 'DESELECT_TRANSACTION';
+
+export function selectTransaction(transaction) {
+  return {
+    type: SELECT_TRANSACTION,
+    transaction
+  }
+}
+
+export function deselectTransaction() {
+  return {
+    type: DESELECT_TRANSACTION
   }
 }
