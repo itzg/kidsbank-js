@@ -4,6 +4,8 @@ import me.itzg.kidsbank.types.ExtendedContentTypes;
 import me.itzg.kidsbank.types.Transaction;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
@@ -21,6 +23,19 @@ import static org.junit.Assert.assertThat;
  */
 public class TransactionsFileProcessorTest {
 
+    private String origTZ;
+
+    @Before
+    public void setUp() throws Exception {
+        // The POI date cell handling uses the local timezone, but this doesn't work consistently on CI nodes
+        origTZ = System.setProperty("user.timezone", "UTC");
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        System.setProperty("user.timezone", origTZ);
+    }
+
     @Test
     public void testNormalFile() throws IOException, InvalidFormatException {
         final ClassPathResource resource = new ClassPathResource("transactions.xlsx");
@@ -34,11 +49,11 @@ public class TransactionsFileProcessorTest {
             final List<Transaction> transactions = processor.process(multipartFile);
             assertThat(transactions, Matchers.hasSize(12));
 
-            assertEquals(1508099856000L, transactions.get(0).getWhen().getTime());
+            assertEquals(1508081856000L, transactions.get(0).getWhen().getTime());
             assertEquals("Nonjob", transactions.get(0).getDescription());
             assertEquals(100f, transactions.get(0).getAmount(), 0.001);
 
-            assertEquals(1506976486000L, transactions.get(11).getWhen().getTime());
+            assertEquals(1506958486000L, transactions.get(11).getWhen().getTime());
             assertEquals("old thing", transactions.get(11).getDescription());
             assertEquals(-3.45f, transactions.get(11).getAmount(), 0.001);
         }
