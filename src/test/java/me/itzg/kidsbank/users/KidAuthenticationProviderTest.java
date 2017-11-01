@@ -1,6 +1,7 @@
 package me.itzg.kidsbank.users;
 
 import me.itzg.kidsbank.config.KidsbankProperties;
+import me.itzg.kidsbank.errors.BadCredentialFieldException;
 import me.itzg.kidsbank.services.KidlinkService;
 import me.itzg.kidsbank.types.KidLogin;
 import me.itzg.kidsbank.types.KidRegistration;
@@ -10,12 +11,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +40,7 @@ public class KidAuthenticationProviderTest {
     public static final String ENCODED_PREFIX = "encoded-";
 
     @TestConfiguration
-    @Import({KidAuthenticationProvider.class, MongoIndexes.class})
+    @Import({KidAuthenticationProvider.class, MongoIndexes.class, ValidationAutoConfiguration.class})
     public static class Config {
         @Bean
         public KidsbankProperties kidsbankProperties() {
@@ -154,7 +155,7 @@ public class KidAuthenticationProviderTest {
         assertNotNull(authenticated);
     }
 
-    @Test(expected = BadCredentialsException.class)
+    @Test(expected = BadCredentialFieldException.class)
     public void testLoginWrongPassword() {
         final KidRegistration registration = new KidRegistration();
         registration.setUsername("testLoginWrongPassword");
@@ -180,7 +181,7 @@ public class KidAuthenticationProviderTest {
         kidAuthenticationProvider.authenticate(new KidAuthenticationToken(login));
     }
 
-    @Test(expected = BadCredentialsException.class)
+    @Test(expected = BadCredentialFieldException.class)
     public void testLoginUnknownUser() {
         final KidLogin login = new KidLogin();
         login.setUsername("testLoginUnknownUser");

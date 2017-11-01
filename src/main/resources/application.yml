@@ -1,7 +1,4 @@
 spring:
-  social:
-    facebook:
-      app-id: 1260180640753397
   data:
     mongodb:
       database: kidsbank

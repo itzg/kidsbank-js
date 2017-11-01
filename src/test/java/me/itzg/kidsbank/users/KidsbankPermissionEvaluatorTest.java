@@ -55,7 +55,8 @@ public class KidsbankPermissionEvaluatorTest {
     public void testParentCanShare() {
         final TestingAuthenticationToken auth = new TestingAuthenticationToken(
                 parent.getId(),
-                "");
+                "",
+                Collections.singletonList(Authorities.PARENT_AUTHORITY));
         final boolean result = permissionEvaluator.hasPermission(auth,
                                                                  account.getId(),
                                                                  Types.ACCOUNT,
@@ -68,7 +69,8 @@ public class KidsbankPermissionEvaluatorTest {
     public void testParentDoesntExistCantShare() {
         final TestingAuthenticationToken auth = new TestingAuthenticationToken(
                 "not a real parent ID",
-                "");
+                "",
+                Collections.singletonList(Authorities.PARENT_AUTHORITY));
         final boolean result = permissionEvaluator.hasPermission(auth,
                                                                  account.getId(),
                                                                  Types.ACCOUNT,
@@ -81,7 +83,8 @@ public class KidsbankPermissionEvaluatorTest {
     public void testParentDoesntHaveAccountCantShare() {
         final TestingAuthenticationToken auth = new TestingAuthenticationToken(
                 parent.getId(),
-                "");
+                "",
+                Collections.singletonList(Authorities.PARENT_AUTHORITY));
         final boolean result = permissionEvaluator.hasPermission(auth,
                                                                  "wrong account ID",
                                                                  Types.ACCOUNT,
