@@ -26,19 +26,29 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "pom.xml" }}
+          - mvn-dependencies-{{ checksum "pom.xml" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - mvn-dependencies-
+      - restore_cache:
+          keys:
+          - npm-dependencies-{{ checksum "src/main/app/package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - npm-dependencies-
 
       - run: mvn dependency:go-offline
 
       - save_cache:
           paths:
             - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
+          key: mvn-dependencies-{{ checksum "pom.xml" }}
 
       # run tests!
       - run: mvn integration-test
+
+      - save_cache:
+          paths:
+            - src/main/app/node_modules
+          key: npm-dependencies-{{ checksum "src/main/app/package.json" }}
 
   package:
     docker:
@@ -62,9 +72,14 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "pom.xml" }}
+          - mvn-dependencies-{{ checksum "pom.xml" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - mvn-dependencies-
+      - restore_cache:
+          keys:
+          - npm-dependencies-{{ checksum "src/main/app/package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - npm-dependencies-
 
       - run: mvn package
 
@@ -79,4 +94,6 @@ workflows:
   test_and_package:
     jobs:
       - test
-      - package
+      - package:
+          requires:
+            - test
