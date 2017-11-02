@@ -183,12 +183,12 @@
                         <id>default</id>
                         <goals>
                             <goal>build</goal>
-                            <!--<goal>push</goal>-->
+                            <goal>push</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <repository>itzg/kidsbank-js</repository>
+                    <repository>registry.hub.docker.io/itzg/kidsbank-js</repository>
                     <tag>${project.version}</tag>
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
