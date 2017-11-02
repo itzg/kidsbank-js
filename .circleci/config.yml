@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  test:
+  test_and_package:
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:8-jdk
@@ -35,53 +35,23 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - npm-dependencies-
 
-      - run: mvn dependency:go-offline
+      - run: mvn dependency:go-offline generate-resources
 
       - save_cache:
           paths:
             - ~/.m2
           key: mvn-dependencies-{{ checksum "pom.xml" }}
-
-      # run tests!
-      - run: mvn integration-test
-
       - save_cache:
           paths:
             - src/main/app/node_modules
           key: npm-dependencies-{{ checksum "src/main/app/package.json" }}
 
-  package:
-    docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+      # run tests!
+      - run: mvn integration-test
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
-    environment:
-      # Customize the JVM maximum heap limit
-      MAVEN_OPTS: -Xmx3200m
-
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - mvn-dependencies-{{ checksum "pom.xml" }}
-          # fallback to using the latest cache if no exact match is found
-          - mvn-dependencies-
-      - restore_cache:
-          keys:
-          - npm-dependencies-{{ checksum "src/main/app/package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - npm-dependencies-
-
-      - run: mvn package
+      - store_artifacts:
+          path: target/kidsbank-js.jar
+          destination: kidsbank-js.jar
 
       - persist_to_workspace:
           root: target
@@ -93,7 +63,4 @@ workflows:
   version: 2
   test_and_package:
     jobs:
-      - test
-      - package:
-          requires:
-            - test
+      - test_and_package
