@@ -69,8 +69,9 @@ jobs:
       - run: mvn package
 
       - persist_to_workspace:
+          root: target
           paths:
-            - target/kidsbank-js.jar
+            - kidsbank-js.jar
 
 
 workflows:
