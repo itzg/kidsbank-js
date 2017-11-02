@@ -147,11 +147,11 @@
                 <version>3.0.1</version>
                 <executions>
                     <execution>
-                        <id>position react build</id>
+                        <id>position-react-build</id>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
-                        <phase>generate-resources</phase>
+                        <phase>prepare-package</phase>
                         <configuration>
                             <outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
                             <resources>
