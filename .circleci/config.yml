@@ -52,13 +52,8 @@ jobs:
       - run: mvn integration-test
 
       - store_artifacts:
-          path: target/kidsbank-js.jar
-          destination: kidsbank-js.jar
-
-      - persist_to_workspace:
-          root: target
-          paths:
-            - kidsbank-js.jar
+          path: target/kidsbank-js*.jar
+          destination:
 
 
 workflows:
