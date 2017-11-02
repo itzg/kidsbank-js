@@ -46,6 +46,8 @@ jobs:
             - src/main/app/node_modules
           key: npm-dependencies-{{ checksum "src/main/app/package.json" }}
 
+      - setup_remote_docker
+
       # run tests!
       - run: mvn integration-test
 
