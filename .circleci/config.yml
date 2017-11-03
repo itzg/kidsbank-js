@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  test:
+  test_and_package:
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:8-jdk
@@ -46,43 +46,10 @@ jobs:
             - src/main/app/node_modules
           key: npm-dependencies-{{ checksum "src/main/app/package.json" }}
 
-      - run: mvn test
-
-  package:
-    docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
-    environment:
-      # Customize the JVM maximum heap limit
-      MAVEN_OPTS: -Xmx3200m
-
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - mvn-dependencies-{{ checksum "pom.xml" }}
-          # fallback to using the latest cache if no exact match is found
-          - mvn-dependencies-
-      - restore_cache:
-          keys:
-          - npm-dependencies-{{ checksum "src/main/app/package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - npm-dependencies-
-
       - setup_remote_docker
 
       # includes package goal
-      - run: mvn -s settings.xml -Ddockerfile.useMavenSettingsForAuth=true integration-test
+      - run: mvn -s settings.xml -Ddockerfile.useMavenSettingsForAuth=true deploy
 
       - run: |
           mkdir -p /tmp/jars
@@ -95,7 +62,4 @@ workflows:
   version: 2
   test_and_package:
     jobs:
-      - test
-      - package:
-          requires:
-            - test
+      - test_and_package
