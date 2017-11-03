@@ -49,7 +49,7 @@ jobs:
       - setup_remote_docker
 
       # includes package goal
-      - run: mvn -s settings.xml -Ddockerfile.useMavenSettingsForAuth=true deploy
+      - run: mvn -s settings.xml -Ddockerfile.useMavenSettingsForAuth=true integration-test
 
       - run: |
           mkdir -p /tmp/jars
