@@ -4,8 +4,6 @@ import me.itzg.kidsbank.types.ExtendedContentTypes;
 import me.itzg.kidsbank.types.Transaction;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
@@ -14,8 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 
 /**
  * @author Geoff Bourne
@@ -23,21 +23,9 @@ import static org.junit.Assert.assertThat;
  */
 public class TransactionsFileProcessorTest {
 
-    private String origTZ;
-
-    @Before
-    public void setUp() throws Exception {
-        // The POI date cell handling uses the local timezone, but this doesn't work consistently on CI nodes
-        origTZ = System.setProperty("user.timezone", "UTC");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        System.setProperty("user.timezone", origTZ);
-    }
-
     @Test
     public void testNormalFile() throws IOException, InvalidFormatException {
+        assumeThat(System.getProperty("user.timezone"), is("UTC"));
         final ClassPathResource resource = new ClassPathResource("transactions.xlsx");
         try (InputStream inputStream = resource.getInputStream()) {
             final MockMultipartFile multipartFile = new MockMultipartFile("transactions.xlsx",

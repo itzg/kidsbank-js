@@ -2,6 +2,11 @@ spring:
   data:
     mongodb:
       database: kidsbank
+      host: ${mongodbHost:localhost}
   mvc:
     media-types:
       xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+  social:
+    facebook:
+      app-id: ${facebookAppId:}
+      app-secret: ${facebookAppSecret:}
