@@ -4,7 +4,7 @@
                           https://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
-            <id>registry.hub.docker.io</id>
+            <id>registry.hub.docker.com</id>
             <username>${env.DOCKER_HUB_USER}</username>
             <password>${env.DOCKER_HUB_PASSWORD}</password>
         </server>
