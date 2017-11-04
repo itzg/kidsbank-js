@@ -1,0 +1,32 @@
+.Introduction {
+    display: flex;
+    justify-content: center;
+    margin: 0 1rem;
+}
+
+.Introduction > div.ui.icon.message {
+    width: auto;
+}
+
+.Introduction .actions {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.Introduction .githubLinks {
+    font-size: smaller;
+    text-align: center;
+    margin-top: 1em;
+}
+
+.Introduction div.content {
+    margin-right: .6em;
+}
+
+.Introduction div.content > div + div {
+    margin-top: .5em;
+}
+
+.Introduction .content .main > div + div {
+    margin-top: .25em;
+}

@@ -1,7 +1,9 @@
 import React from 'react';
-import {Field, reduxForm} from 'redux-form';
+import {Field as ReduxField, reduxForm} from 'redux-form';
 import ValidatedFormField from "../../components/ValidatedFormField";
-import {Button, Form, Icon, Input, Message} from "semantic-ui-react";
+import {Button, Form, Input, Message} from "semantic-ui-react";
+import {required} from "../../components/validators";
+import RegisterInstructions from './RegisterInstructions';
 
 const KidRegisterForm = (props) => {
   const {
@@ -9,25 +11,26 @@ const KidRegisterForm = (props) => {
   } = props;
   return (
     <Form className={props.className} onSubmit={props.handleSubmit}>
-      <Message icon>
-        <Icon name='info'/>
-        <Message.Content>
-          <Message.Header>Before registering</Message.Header>
-          Please ask your parent to enter Kidsbank, create an account for you, and click "Share".
-          You will use the kidslink code that is generated to register your own username and password here.
-        </Message.Content>
-      </Message>
-      <Field name='username' component={ValidatedFormField} control={Input} label='Username'/>
-      <Field name='password' type='password' component={ValidatedFormField} control={Input} label='Password'/>
-      <Field name='passwordAgain' type='password' component={ValidatedFormField} control={Input}
-             label='Re-enter your password'/>
-      <Field name='kidlinkCode' component={ValidatedFormField} control={Input} label='Kidlink code'/>
+      <RegisterInstructions/>
+      <ReduxField name='username' label='Username'
+                  component={ValidatedFormField} control={Input} warnWhenPristine={true}
+                  validate={required}/>
+      <ReduxField name='password' type='password' label='Password'
+                  component={ValidatedFormField} control={Input} warnWhenPristine={true}
+                  validate={required}/>
+      <ReduxField name='passwordAgain' type='password' label='Re-enter your password'
+                  component={ValidatedFormField} control={Input} warnWhenPristine={true}
+                  validate={required}/>
+      <ReduxField name='kidlinkCode' label='Kidlink code'
+                  component={ValidatedFormField} control={Input} warnWhenPristine={true}
+                  validate={required}/>
 
       {props.invalid && props.error &&
       <Message negative content={props.error}/>}
 
       <div className='Actions'>
-        <Button disabled={props.invalid} loading={props.submitting} type='submit' primary>Register</Button>
+        <Button disabled={props.invalid || props.pristine} loading={props.submitting} type='submit'
+                primary>Register</Button>
         or already have an account? <Button basic onClick={onSwitchToLogin}>Login</Button>
       </div>
     </Form>

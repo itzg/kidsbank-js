@@ -5,6 +5,7 @@ import transactions from './transactions';
 import session from './session';
 import notifications from './notifications';
 import scheduled from './scheduled';
+import persisted from './peristed';
 import {reducer as formReducer} from 'redux-form';
 
 const rootReducer = combineReducers({
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   session,
   notifications,
   scheduled,
+  persisted,
   form: formReducer
 });
 

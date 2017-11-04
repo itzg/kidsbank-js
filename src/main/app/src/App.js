@@ -5,6 +5,7 @@ import Notifications from './components/Notifications';
 import Welcome from './scenes/Welcome';
 import Parents from './scenes/Parents';
 import Kids from './scenes/Kids';
+import Footer from './Footer';
 
 class App extends Component {
 
@@ -13,11 +14,14 @@ class App extends Component {
     return (
       <div className="App">
         <Notifications/>
-        <Switch>
-          <Route path="/parent" component={Parents}/>
-          <Route path="/kid" component={Kids}/>
-          <Route component={Welcome}/>
-        </Switch>
+        <main>
+          <Switch>
+            <Route path="/parent" component={Parents}/>
+            <Route path="/kid" component={Kids}/>
+            <Route component={Welcome}/>
+          </Switch>
+        </main>
+        <Footer/>
       </div>
     );
   }

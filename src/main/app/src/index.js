@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import {applyMiddleware, createStore} from 'redux';
+import {applyMiddleware, compose, createStore} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {createLogger} from 'redux-logger';
 import {BrowserRouter as Router} from 'react-router-dom';
+import persistState from 'redux-localstorage';
 
 import rootReducer from './reducers';
 
@@ -17,10 +18,15 @@ const loggerMiddleware = createLogger();
 
 const store = createStore(
   rootReducer,
-  applyMiddleware(
-    restApiMiddleware,
-    thunkMiddleware,
-    loggerMiddleware
+  compose(
+    applyMiddleware(
+      restApiMiddleware,
+      thunkMiddleware,
+      loggerMiddleware
+    ),
+    persistState('persisted', {
+      key: 'kidsbank'
+    })
   )
 );
 

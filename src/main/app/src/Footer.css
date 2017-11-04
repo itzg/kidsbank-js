@@ -1,0 +1,12 @@
+
+.Footer {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    padding: 5px;
+    box-shadow: 0 -2px 10px 0 #c6c6c6;
+}
+
+.Footer > .fill {
+    flex-grow: 1;
+}
