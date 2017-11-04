@@ -6,6 +6,7 @@ import {
   FETCH_ACCOUNTS_SUCCESS,
   FETCH_PRIMARY_ACCOUNT_BALANCE_START,
   FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS,
+  FETCH_PRIMARY_ACCOUNT_SUMMARY_SUCCESS,
   FETCH_SINGLE_ACCOUNT_START,
   FETCH_SINGLE_ACCOUNT_SUCCESS
 } from "../actions/accounts";
@@ -117,6 +118,15 @@ export default function accounts(state = {
             fetching: false,
             balance: action.balance
           }
+        }
+      };
+
+    case FETCH_PRIMARY_ACCOUNT_SUMMARY_SUCCESS:
+      return {
+        ...state,
+        primary: {
+          ...state.primary,
+          id: action.summary.id
         }
       };
 

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Geoff Bourne
  * @since Sep 2017
  */
-@ResponseStatus(HttpStatus.NOT_FOUND)
+@ResponseStatus(HttpStatus.BAD_REQUEST)
 public class NotFoundException extends Exception {
     public NotFoundException(String message) {
         super(message);

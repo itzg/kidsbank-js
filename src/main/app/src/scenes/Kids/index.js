@@ -6,7 +6,8 @@ import {Link, Redirect} from 'react-router-dom';
 import KidsbankLogo from '../../components/KidsbankLogo';
 import Balance from '../../components/Balance';
 import './index.css';
-import {fetchKidPrimaryAccountBalance} from "../../actions/accounts";
+import {fetchKidPrimaryAccountBalance, fetchPrimaryAccountSummary} from "../../actions/accounts";
+import Transactions from '../Transactions';
 
 class Kids extends Component {
 
@@ -33,8 +34,12 @@ class Kids extends Component {
             </div>
           </div>
 
-          <div className='balanceContainer'>
-            <Balance fetching={this.props.balance.fetching} balance={this.props.balance.balance} size='large'/>
+          <div className="content">
+            <div className='balanceContainer'>
+              <Balance fetching={this.props.balance.fetching} balance={this.props.balance.balance} size='large'/>
+            </div>
+
+            {this.props.accountId && <Transactions accountId={this.props.accountId} editable={false}/>}
           </div>
         </div>
       );
@@ -45,7 +50,7 @@ class Kids extends Component {
   componentDidMount() {
     this.props.fetchUserProfile()
       .then(() => {
-        this.props.fetchPrimaryAccountBalance();
+        this.props.fetchPrimaryAccountInfo();
       });
   }
 }
@@ -60,7 +65,8 @@ const
       profile: user.profile,
       loggedIn: user.loggedIn,
       role: user.role,
-      balance: state.accounts.primary.balance
+      balance: state.accounts.primary.balance,
+      accountId: state.accounts.primary.id
     }
   };
 
@@ -75,8 +81,9 @@ const
         return dispatch(fetchUserProfile());
       },
 
-      fetchPrimaryAccountBalance() {
-        return dispatch(fetchKidPrimaryAccountBalance());
+      fetchPrimaryAccountInfo() {
+        dispatch(fetchKidPrimaryAccountBalance());
+        dispatch(fetchPrimaryAccountSummary());
       }
     }
   };

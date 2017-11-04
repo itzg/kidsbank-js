@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {fetchAccountBalance, fetchSingleAccount} from '../../../actions/accounts';
 import './index.css';
 import CreateTransaction from './CreateTransaction';
-import Transactions from './Transactions';
+import Transactions from '../../Transactions';
 import {createTransaction, loadInitialTransactions} from "../../../actions/transactions";
 import Balance from "../../../components/Balance";
 

@@ -22,4 +22,8 @@ public class ResponseValue<T> {
     public void setValue(T value) {
         this.value = value;
     }
+
+    public static <T> ResponseValue<T> of(T value) {
+        return new ResponseValue<>(value);
+    }
 }

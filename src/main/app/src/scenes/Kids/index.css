@@ -14,5 +14,11 @@
 }
 
 .Kids .balanceContainer {
-    text-align: center;
+}
+
+.Kids .content {
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

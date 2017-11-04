@@ -2,7 +2,7 @@ import React from 'react';
 import {Button, Modal} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import EditTransactionForm from './EditTransactionForm'
-import {deleteTransaction, saveTransaction} from "../../../actions/transactions";
+import {deleteTransaction, saveTransaction} from "../../actions/transactions";
 
 class EditTransactionModal extends React.Component {
 

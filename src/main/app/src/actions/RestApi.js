@@ -17,6 +17,9 @@ function handleResponse(response) {
     if (response.headers.get('Content-Length') === '0' || !response.headers.has('Content-Type')) {
       return Promise.resolve('');
     }
+    else if (response.status === 302) {
+      return Promise.reject();
+    }
 
     return response.json();
   }

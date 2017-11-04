@@ -8,11 +8,11 @@ import {
   loadOlderTransactions,
   reloadInitialTransactions,
   selectTransaction
-} from "../../../actions/transactions";
+} from "../../actions/transactions";
 import moment from 'moment';
-import {formatCurrency} from '../../../components/locale';
+import {formatCurrency} from '../../components/locale';
 import './Transactions.css';
-import {fetchAccountBalance} from "../../../actions/accounts";
+import {fetchAccountBalance} from "../../actions/accounts";
 import EditTransactionModal from './EditTransactionModal';
 
 function IncomeCell(props) {
@@ -106,7 +106,7 @@ class Transactions extends Component {
                           onClick={this.props.loadNewerTransactions} className='newer'/>}
                   <div className='actions'>
                     <Button content='Reload' icon='refresh' onClick={this.props.reloadTransactions}/>
-                    <EditTransactionModal transaction={this.state.selected}/>
+                    {this.props.editable && <EditTransactionModal transaction={this.state.selected}/>}
                   </div>
                   {!this.props.page.last &&
                   <Button content='Older' icon='right chevron' labelPosition='right'
@@ -136,7 +136,12 @@ class Transactions extends Component {
   }
 
   static propTypes = {
-    accountId: PropTypes.string
+    accountId: PropTypes.string,
+    editable: PropTypes.bool
+  };
+
+  static defaultProps = {
+    editable: true
   }
 }
 

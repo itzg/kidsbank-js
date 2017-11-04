@@ -129,10 +129,10 @@ export function reloadInitialTransactions(accountId) {
 }
 
 export function loadPageOfTransactions(accountId, pageNumber, pageSize) {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     dispatch(loadTransactionsStart(accountId, pageNumber));
 
-    return getJson(`/api/parent/accounts/${accountId}/transactions?page=${pageNumber}&size=${pageSize}`)
+    return getJson(`/api/${getState().user.role}/accounts/${accountId}/transactions?page=${pageNumber}&size=${pageSize}`)
       .then(json => {
         dispatch(deselectTransaction());
         dispatch(loadTransactionsSuccess(accountId, json));

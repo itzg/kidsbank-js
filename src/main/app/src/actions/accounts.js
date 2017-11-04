@@ -37,13 +37,13 @@ export function fetchParentManagedAccounts() {
 
 export const FETCH_PRIMARY_ACCOUNT_BALANCE_START = 'FETCH_PRIMARY_ACCOUNT_BALANCE_START';
 
+export const FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS = 'FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS';
+
 function fetchPrimaryAccountBalanceStart() {
   return {
     type: FETCH_PRIMARY_ACCOUNT_BALANCE_START
   }
 }
-
-export const FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS = 'FETCH_PRIMARY_ACCOUNT_BALANCE_SUCCESS';
 
 function fetchPrimaryAccountBalanceSuccess(balance) {
   return {
@@ -60,6 +60,31 @@ export function fetchKidPrimaryAccountBalance() {
       .then(json => {
         dispatch(fetchPrimaryAccountBalanceSuccess(json.value));
       })
+  }
+}
+
+export const FETCH_PRIMARY_ACCOUNT_SUMMARY_START = 'FETCH_PRIMARY_ACCOUNT_SUMMARY_START';
+export const FETCH_PRIMARY_ACCOUNT_SUMMARY_SUCCESS = 'FETCH_PRIMARY_ACCOUNT_SUMMARY_SUCCESS';
+
+export function fetchPrimaryAccountSummary() {
+  return (dispatch) => {
+    dispatch(fetchPrimaryAccountSummaryStart());
+
+    return getJson(`/api/kid/primary-account`)
+      .then(json => {
+        dispatch(fetchPrimaryAccountSummarySuccess(json));
+      })
+  }
+}
+
+function fetchPrimaryAccountSummaryStart() {
+  return {type: FETCH_PRIMARY_ACCOUNT_SUMMARY_START};
+}
+
+function fetchPrimaryAccountSummarySuccess(summary) {
+  return {
+    type: FETCH_PRIMARY_ACCOUNT_SUMMARY_SUCCESS,
+    summary
   }
 }
 

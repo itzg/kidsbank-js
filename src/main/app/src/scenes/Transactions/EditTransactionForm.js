@@ -2,11 +2,11 @@ import React from 'react';
 import {Button, Form, Input} from "semantic-ui-react";
 import {Field, propTypes as formPropTypes, reduxForm} from "redux-form";
 import PropTypes from 'prop-types';
-import ValidatedFormField from "../../../components/ValidatedFormField";
-import FormActions from "../../../components/FormActions";
-import {nonEmpty, number, required} from "../../../components/validators";
-import DatePickerField from "../../../components/DatePickerField";
-import MoneyField from "../../../components/MoneyField";
+import ValidatedFormField from "../../components/ValidatedFormField";
+import FormActions from "../../components/FormActions";
+import {nonEmpty, number, required} from "../../components/validators";
+import DatePickerField from "../../components/DatePickerField";
+import MoneyField from "../../components/MoneyField";
 
 class EditTransactionForm extends React.Component {
   render() {
