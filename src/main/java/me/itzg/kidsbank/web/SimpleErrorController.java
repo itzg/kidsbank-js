@@ -4,14 +4,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
 /**
+ * This was introduced to intercept uncaught errors and redirect to the top level page.
+ *
+ * HOWEVER, it become inelegant since it needs to hardcode understand API requests vs regular
+ * requests.
+ *
  * @author Geoff Bourne
  * @since Oct 2017
  */
@@ -28,7 +37,8 @@ public class SimpleErrorController implements ErrorController {
     }
 
     @RequestMapping("/error")
-    public String handleError(WebRequest request, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<Object> handleError(WebRequest request, RedirectAttributes redirectAttributes,
+                                              UriComponentsBuilder uriBuilder) {
         final Map<String, Object> errorAttributes = this.errorAttributes.getErrorAttributes(request, true);
         log.warn("Intercepted web controller error: request={}, error={}", request, errorAttributes);
 
@@ -36,7 +46,19 @@ public class SimpleErrorController implements ErrorController {
             redirectAttributes.addFlashAttribute(name, errorAttributes.get(name));
         }
 
-        return "redirect:/";
+        final Object path = errorAttributes.get("path");
+        final Object status = errorAttributes.get("status");
+        if (path instanceof String && status instanceof Integer) {
+            if (((String) path).startsWith("/api")) {
+                return ResponseEntity.status((Integer) status)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorAttributes);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).location(uriBuilder.path("/")
+                                                                                     .build((Map<String, ?>) null))
+                .build();
     }
 
     @Override
