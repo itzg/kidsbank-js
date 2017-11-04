@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  mongodb:
+    image: mongo:3.4
+    volumes:
+      - mongodb_data:/data/db
+    deploy:
+      placement:
+        constraints:
+          - node.labels.volumes == main
+
+  backup:
+    image: itzg/mongo-backups
+    volumes:
+      - backup_mongodb:/backups
+    environment:
+      HOST: mongodb
+      INTERVAL: 3600
+    deploy:
+      placement:
+        constraints:
+          - node.labels.volumes == main
+
+  kidsbank:
+    image: itzg/kidsbank-js:0.0.1-SNAPSHOT
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_SOCIAL_FACEBOOK_APPID:
+      SPRING_SOCIAL_FACEBOOK_APPSECRET:
+
+  haproxy:
+    image: itzg/haproxy-lets
+    environment:
+      EMAIL:
+      DOMAINS: ${DOMAIN}@kidsbank:8080
+    volumes:
+      - haproxy_certs:/certs
+      - haproxy_config:/config
+    ports:
+      - 80:80
+      - 443:443
+    deploy:
+      placement:
+        constraints:
+          - node.labels.volumes == main
+
+volumes:
+  mongodb_data:
+  backup_mongodb:
+  haproxy_certs:
+  haproxy_config:
