@@ -13,11 +13,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
  * This was introduced to intercept uncaught errors and redirect to the top level page.
- *
+ * <p>
  * HOWEVER, it become inelegant since it needs to hardcode understand API requests vs regular
  * requests.
  *
@@ -56,8 +57,13 @@ public class SimpleErrorController implements ErrorController {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).location(uriBuilder.path("/")
-                                                                                     .build((Map<String, ?>) null))
+        return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).location(
+                uriBuilder.path("/")
+                        .queryParam("error",
+                                    errorAttributes.get("error"))
+                        .queryParam("message",
+                                    errorAttributes.get("message"))
+                        .build(Collections.emptyMap()))
                 .build();
     }
 
