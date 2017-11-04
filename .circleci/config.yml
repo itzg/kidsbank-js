@@ -66,7 +66,7 @@ jobs:
           name: Checking if this is a release build
           command: |
             if [[ $RELEASE && $NEXT ]]; then
-              mvn -B release:prepare -DreleaseVersion=$RELEASE -DdevelopmentVersion=$NEXT
+              mvn -B release:prepare -DpreparationGoals="clean test" -DreleaseVersion=$RELEASE -DdevelopmentVersion=$NEXT
             else
               echo "Release skipped. Use this to perform a release:
               curl -X POST -H \"Content-Type: application/json\" -d '{
