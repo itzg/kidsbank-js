@@ -24,7 +24,7 @@ const ValidatedFormField = props => {
   return (
     <Form.Field error={meta.invalid && meta.dirty} width={props.width}>
       {label && <label>{label}</label>}
-      {control && React.createElement(control, {...input, ...props.controlProps})}
+      {control && React.createElement(control, {...input, ...props.controlProps, type: props.type})}
 
       {meta.warning && (props.warnWhenPristine || meta.dirty) &&
       <Label basic color='orange' pointing>{meta.warning}</Label>}
@@ -40,7 +40,8 @@ ValidatedFormField.propTypes = {
   control: Form.Field.propTypes.control,
   controlProps: PropTypes.object,
   width: Form.Field.propTypes.width,
-  warnWhenPristine: PropTypes.bool
+  warnWhenPristine: PropTypes.bool,
+  type: Form.Field.propTypes.type
 };
 
 export default ValidatedFormField;
