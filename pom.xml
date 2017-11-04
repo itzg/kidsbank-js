@@ -215,6 +215,8 @@
                 <version>2.5.3</version>
                 <configuration>
                     <tagNameFormat>@{project.version}</tagNameFormat>
+                    <!-- don't include docker build in preparation -->
+                    <preparationGoals>clean test</preparationGoals>
                 </configuration>
             </plugin>
         </plugins>

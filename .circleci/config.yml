@@ -66,7 +66,9 @@ jobs:
           name: Checking if this is a release build
           command: |
             if [[ $RELEASE && $NEXT ]]; then
-              mvn -B release:prepare -DpreparationGoals="clean test" -DreleaseVersion=$RELEASE -DdevelopmentVersion=$NEXT
+              if [[ $GIT_USER_EMAIL ]]; then git config --global user.email "$GIT_USER_EMAIL" ; fi
+              if [[ $GIT_USER_NAME ]]; then git config --global user.name "$GIT_USER_NAME" ; fi
+              mvn -B release:prepare -DreleaseVersion=$RELEASE -DdevelopmentVersion=$NEXT
             else
               echo "Release skipped. Use this to perform a release:
               curl -X POST -H \"Content-Type: application/json\" -d '{
