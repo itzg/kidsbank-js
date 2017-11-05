@@ -11,10 +11,10 @@ function currentYear() {
 export default (props) => {
   return <footer className='Footer'>
     <div>
-      <L href='https://github.com/itzg/kidsbank-js/blob/master/README.md'>What is kidsbank?</L>
+      <L href='https://github.com/itzg/kidsbank-js/blob/master/README.md'>What is kids bank?</L>
     </div>
     <div className='fill'>
-      kidsbank &copy; {currentYear()} Geoff Bourne
+      kids bank &copy; {currentYear()} Geoff Bourne
     </div>
     <div>
       <L href='https://github.com/itzg/kidsbank-js/issues'><Icon name='external'/>Report Issues</L>

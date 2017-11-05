@@ -12,10 +12,10 @@ const Introduction = (props) => {
         <Icon name='comment'/>
         <Message.Content>
           <Message.Header>
-            Welcome to kidsbank
+            Welcome to kids bank
           </Message.Header>
           <div className='main'>
-            <div>Kidsbank is a totally virtual way for parents and kids to keep track of allowance, spending money,
+            <div>kids bank is a totally virtual way for parents and kids to keep track of allowance, spending money,
               IOUs, etc.
             </div>
 
