@@ -23,7 +23,7 @@ services:
           - node.labels.volumes == main
 
   kidsbank:
-    image: itzg/kidsbank-js:0.2.1
+    image: itzg/kidsbank-js:0.2.2
     environment:
       SPRING_DATA_MONGODB_HOST: mongodb
       SPRING_SOCIAL_FACEBOOK_APPID:
