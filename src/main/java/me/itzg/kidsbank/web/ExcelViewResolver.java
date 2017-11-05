@@ -12,8 +12,13 @@ import java.util.Locale;
  */
 @Component
 public class ExcelViewResolver implements ViewResolver {
+    @SuppressWarnings("RedundantThrows")
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
-        return new ExcelView();
+        if (viewName.toLowerCase().endsWith(ContentTypes.XLSX_EXTENSION)) {
+            return new ExcelView();
+        } else {
+            return null;
+        }
     }
 }
