@@ -24,3 +24,5 @@ nbdist/
 .nb-gradle/
 
 /stack-deploy.bat
+
+/*.env

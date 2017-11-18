@@ -14,6 +14,8 @@ services:
     image: itzg/mongo-backups:1.0
     volumes:
       - backup_mongodb:/backups
+    env_file:
+      - rclone.env
     environment:
       HOST: mongodb
       INTERVAL: 43200
@@ -26,17 +28,16 @@ services:
           - node.labels.volumes == main
 
   kidsbank:
-    image: itzg/kidsbank-js:0.2.2
+    image: itzg/kidsbank-js:0.3.0
+    env_file:
+      - social.env
     environment:
       SPRING_DATA_MONGODB_HOST: mongodb
-      SPRING_SOCIAL_FACEBOOK_APPID:
-      SPRING_SOCIAL_FACEBOOK_APPSECRET:
 
   haproxy:
     image: itzg/haproxy-lets
-    environment:
-      EMAIL:
-      DOMAINS: ${DOMAIN}@kidsbank:8080
+    env_file:
+      - letencrypt.env
     volumes:
       - haproxy_certs:/certs
       - haproxy_config:/config
