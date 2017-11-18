@@ -30,7 +30,7 @@ public class ParentAccountService implements SocialUserDetailsService {
 
     @Override
     public SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
-        log.debug("Loading user={}", userId);
+        log.info("Loading user={}", userId);
         if (!parentRepository.existsById(userId)) {
             log.debug("User={} not found", userId);
             throw new UsernameNotFoundException(userId);
@@ -46,7 +46,7 @@ public class ParentAccountService implements SocialUserDetailsService {
 
         final Parent saved = parentRepository.save(parent);
 
-        log.debug("Saved new parent={}", saved);
+        log.info("Saved new parent={}", saved);
 
         return saved.getId();
     }

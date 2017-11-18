@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Header, Icon} from 'semantic-ui-react';
+import {Header} from 'semantic-ui-react';
+import {FacebookLoginAction, GithubLoginAction, LinkedInLoginAction, TwitterLoginAction} from './ProviderLoginActions';
+import './ParentLogin.css';
 
 class ParentLogin extends Component {
 
@@ -10,15 +12,21 @@ class ParentLogin extends Component {
         <Header>Login with your social account
           <Header.Subheader>and avoid keeping track of yet another password</Header.Subheader>
         </Header>
-        <Button color='facebook' onClick={this.props.onLogin}>
-          <Icon name='facebook'/> Log in with Facebook
-        </Button>
+
+        <div className='loginActions'>
+          <FacebookLoginAction onLogin={this.props.onLogin} lastUsedProvider={this.props.lastUsedProvider}/>
+          <GithubLoginAction onLogin={this.props.onLogin} lastUsedProvider={this.props.lastUsedProvider}/>
+          <LinkedInLoginAction onLogin={this.props.onLogin} lastUsedProvider={this.props.lastUsedProvider}/>
+          <TwitterLoginAction onLogin={this.props.onLogin} lastUsedProvider={this.props.lastUsedProvider}/>
+        </div>
+
       </div>
     );
   }
 
   static propTypes = {
-    onLogin: PropTypes.func
+    onLogin: PropTypes.func,
+    lastUsedProvider: PropTypes.string
   }
 }
 

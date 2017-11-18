@@ -46,11 +46,20 @@ export function receiveUserProfile(profile) {
   }
 }
 
-export const LOGIN_PARENT = 'LOGIN_PARENT';
+export const LOGIN_PARENT_START = 'LOGIN_PARENT_START';
 
-export function loginParent() {
-  return () => {
-    window.location = '/signin/facebook';
+export function loginParent(provider) {
+  return (dispatch) => {
+    dispatch(loginParentStart(provider));
+
+    window.location = `/signin/${provider}`;
+  }
+}
+
+function loginParentStart(provider) {
+  return {
+    type: LOGIN_PARENT_START,
+    provider
   }
 }
 

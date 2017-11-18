@@ -25,7 +25,8 @@ class Login extends Component {
     switch (this.state.loginType) {
 
       case LOGIN_TYPE_PARENT:
-        inner = <ParentLogin onLogin={this.props.handleParentLogin}/>;
+        inner = <ParentLogin onLogin={this.props.handleParentLogin}
+                             lastUsedProvider={this.props.lastUsedProvider}/>;
         break;
 
       case LOGIN_TYPE_KID:
@@ -71,13 +72,16 @@ class Login extends Component {
 }
 
 const mapStateToProps = state => {
-  return {};
+
+  return {
+    lastUsedProvider: state.persisted.lastUsedProvider
+  };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    handleParentLogin() {
-      dispatch(loginParent());
+    handleParentLogin(provider) {
+      dispatch(loginParent(provider));
     }
 
   }

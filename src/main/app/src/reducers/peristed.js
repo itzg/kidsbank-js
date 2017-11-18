@@ -1,4 +1,5 @@
 import {DISMISS_INTRO} from "../actions/persisted";
+import {LOGIN_PARENT_START} from "../actions/user";
 
 export default function persisted(state = {
                                     introDismissed: false
@@ -9,6 +10,12 @@ export default function persisted(state = {
       return {
         ...state,
         introDismissed: true
+      };
+
+    case LOGIN_PARENT_START:
+      return {
+        ...state,
+        lastUsedProvider: action.provider
       };
 
     default:

@@ -1,0 +1,9 @@
+.ParentLogin > .loginActions {
+    display: flex;
+    flex-direction: column;
+    min-width: 15em;
+}
+
+.ParentLogin > .loginActions > * + * {
+    margin-top: 5px;
+}

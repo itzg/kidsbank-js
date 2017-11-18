@@ -39,7 +39,7 @@ public class ParentsConnectionRepository implements UsersConnectionRepository {
     public List<String> findUserIdsWithConnection(Connection<?> connection) {
         final ConnectionKey connectionKey = connection.getKey();
 
-        log.debug("find user IDs from connection provider={}, user={}",
+        log.debug("Finding user IDs with connection provider={}, user={}",
                   connectionKey.getProviderId(), connectionKey.getProviderUserId());
 
         final Query query = Query.query(
@@ -61,19 +61,28 @@ public class ParentsConnectionRepository implements UsersConnectionRepository {
             }
         }
 
+        log.info("Found user IDs={} with connection provider={}, user={}",
+                 localUserIds, connectionKey.getProviderId(), connectionKey.getProviderUserId());
         return localUserIds;
     }
 
     @Override
     public Set<String> findUserIdsConnectedTo(String providerId, Set<String> providerUserIds) {
+        log.debug("Finding user IDs connected to provider={}, userIds={}",
+                  providerId, providerUserIds);
+
         final Query query = Query.query(
                 where("socialConnections.provider").is(providerId)
                         .and("socialConnections.user").in(providerUserIds));
         query.fields().include("_id");
 
-        return mongoTemplate.find(query, Parent.class).stream()
+        final Set<String> ids = mongoTemplate.find(query, Parent.class).stream()
                 .map(Parent::getId)
                 .collect(Collectors.toSet());
+
+        log.debug("Found user IDs={} connected to provider={}, userIds={}",
+                  ids, providerId, providerUserIds);
+        return ids;
     }
 
     @Override
