@@ -1,4 +1,4 @@
-version: "3"
+version: "3.1"
 
 services:
   mongodb:
@@ -11,12 +11,15 @@ services:
           - node.labels.volumes == main
 
   backup:
-    image: itzg/mongo-backups
+    image: itzg/mongo-backups:1.0
     volumes:
       - backup_mongodb:/backups
     environment:
       HOST: mongodb
-      INTERVAL: 3600
+      INTERVAL: 43200
+      RCLONE_REMOTE_PATH:
+    secrets:
+      - rclone.conf
     deploy:
       placement:
         constraints:
@@ -50,3 +53,7 @@ volumes:
   backup_mongodb:
   haproxy_certs:
   haproxy_config:
+
+secrets:
+  rclone.conf:
+    external: true
