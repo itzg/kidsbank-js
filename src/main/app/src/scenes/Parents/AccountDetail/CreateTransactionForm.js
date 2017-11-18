@@ -2,7 +2,7 @@ import React from 'react';
 import {Field as ReduxField, reduxForm} from 'redux-form';
 import {Form, Input, Segment} from 'semantic-ui-react';
 import {Prompt} from 'react-router-dom';
-import 'react-datepicker/dist/datepicker.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import {nonEmpty, number, required} from '../../../components/validators';
 import MoneyField from "../../../components/MoneyField";
 import DatePickerField from "../../../components/DatePickerField";
