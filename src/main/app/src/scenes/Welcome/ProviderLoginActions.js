@@ -21,7 +21,7 @@ class ProviderLoginAction extends React.Component {
     let basic = lastUsedProvider && this._provider !== lastUsedProvider;
 
     return (
-      <Button color={this._colorName} basic={basic} onClick={() => this.props.onLogin(this._provider)}>
+      <Button color={this._colorName} basic={basic} onClick={() => this.props.onLogin(this._provider)} size='big'>
         <Icon name={this._iconName}/> Log in with {this._label}
       </Button>
     )
