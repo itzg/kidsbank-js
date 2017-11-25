@@ -1,9 +1,11 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Button, Card, Message} from 'semantic-ui-react';
+import {Button, Card, Message, Popup} from 'semantic-ui-react';
 import PT from 'prop-types';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import {fetchAccountBalance} from "../../../actions/accounts";
 import Balance from '../../../components/Balance';
+import {createNotification} from "../../../actions/notifications";
 
 class Account extends React.Component {
   render() {
@@ -23,12 +25,18 @@ class Account extends React.Component {
           <Balance balance={this.props.balance.balance} fetching={this.props.balance.fetching} size='tiny'/>
         </Card.Description>
       </Card.Content>
-      <Card.Content extra>
+      <Card.Content extra onClick={(evt) => evt.stopPropagation()}>
         {shareCode &&
-        <Message info positive>Kidlink code is {shareCode}</Message>}
+        <CopyToClipboard text={shareCode} onCopy={this.props.kidlinkCodeCopied}>
+          <Message info positive>Kidlink code is {shareCode}</Message>
+        </CopyToClipboard>
+        }
         <div>
-          <Button onClick={onManage}>Manage</Button>
-          <Button onClick={onShare}>Share</Button>
+          <Popup trigger={<Button onClick={onManage}>Manage</Button>}
+                 content='Schedule transactions, etc'
+          />
+          <Popup trigger={<Button onClick={onShare}>Share</Button>}
+                 content='Generate a kidlink code for kid registration'/>
         </div>
       </Card.Content>
     </Card>
@@ -57,6 +65,10 @@ function mapDispatchToProps(dispatch, ownProps) {
   return {
     fetchBalance() {
       dispatch(fetchAccountBalance(ownProps.account.id));
+    },
+
+    kidlinkCodeCopied() {
+      dispatch(createNotification('Kidlink code copied to clipboard'));
     }
   }
 }
