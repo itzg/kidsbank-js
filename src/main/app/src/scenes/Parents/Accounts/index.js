@@ -1,10 +1,13 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Button, Loader} from 'semantic-ui-react';
+import {Button, Loader, Message} from 'semantic-ui-react';
 import CreateAccountModal from "./CreateAccountModal";
 import {createAccount, fetchParentManagedAccounts, shareAccount} from '../../../actions/accounts';
 import Account from './Account';
 import './index.css';
+import {dismissInstruction} from "../../../actions/persisted";
+
+const INSTRUCTION_ID_ACCOUNTS_CARD = 'accountsCardNote';
 
 class Accounts extends Component {
   constructor(props) {
@@ -23,8 +26,10 @@ class Accounts extends Component {
       listArea = <Loader active inline/>
     }
 
-    if (this.props.accounts.length === 0) {
-      listArea = <div>No accounts yet. Go ahead and create one.</div>
+    const hasAccounts = this.props.accounts.length !== 0;
+
+    if (!hasAccounts) {
+      listArea = <Message>No accounts yet. Go ahead and create one.</Message>
     }
     else {
       const cards =
@@ -51,6 +56,13 @@ class Accounts extends Component {
     }
 
     return <div className="Accounts">
+      {hasAccounts &&
+      <Message info compact hidden={this.props.dismissedCardInstruction}
+               onDismiss={this.props.handleCardInstructionDismiss}
+               icon='idea'
+               content='Click one of the cards below to view and edit transactions.'
+      />
+      }
       {listArea}
       <div className="ListActions">
         <Button onClick={this.handleCreateStart} disabled={this.state.isCreating}>Create an account</Button>
@@ -104,12 +116,15 @@ class Accounts extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const {accounts} = state;
+  const {
+    accounts,
+    persisted
+  } = state;
 
   return {
     loading: accounts.loading,
-    accounts: accounts.byId ? Object.entries(accounts.byId).map(entry => entry[1]) : []
-
+    accounts: accounts.byId ? Object.entries(accounts.byId).map(entry => entry[1]) : [],
+    dismissedCardInstruction: (persisted.instructionsDismissed || []).includes(INSTRUCTION_ID_ACCOUNTS_CARD)
   }
 };
 
@@ -125,6 +140,10 @@ const mapDispatchToProps = (dispatch) => {
 
     handleCreateAccount(fields) {
       return dispatch(createAccount(fields));
+    },
+
+    handleCardInstructionDismiss() {
+      return dispatch(dismissInstruction(INSTRUCTION_ID_ACCOUNTS_CARD));
     }
   }
 };

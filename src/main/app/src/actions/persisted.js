@@ -5,3 +5,12 @@ export function dismissIntro() {
     type: DISMISS_INTRO
   }
 }
+
+export const DISMISS_INSTRUCTION = 'DISMISS_INSTRUCTION';
+
+export function dismissInstruction(id) {
+  return {
+    type: DISMISS_INSTRUCTION,
+    id
+  }
+}
