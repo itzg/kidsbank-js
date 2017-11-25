@@ -29,11 +29,13 @@ class KidLogin extends Component {
     );
   }
 
-  handleSwitchToRegister = () => {
+  handleSwitchToRegister = (evt) => {
+    evt.preventDefault();
     this.setState({needsToRegister: true});
   };
 
-  handleSwitchToLogin = () => {
+  handleSwitchToLogin = (evt) => {
+    evt.preventDefault();
     this.setState({needsToRegister: false});
   };
 }
