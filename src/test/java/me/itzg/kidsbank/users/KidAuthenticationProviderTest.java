@@ -1,5 +1,6 @@
 package me.itzg.kidsbank.users;
 
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import me.itzg.kidsbank.config.KidsbankProperties;
 import me.itzg.kidsbank.errors.BadCredentialFieldException;
 import me.itzg.kidsbank.services.KidlinkService;
@@ -62,6 +63,11 @@ public class KidAuthenticationProviderTest {
                     return encodedPassword.equals("encoded-" + String.valueOf(rawPassword));
                 }
             };
+        }
+
+        @Bean
+        public CompositeMeterRegistry compositeMeterRegistry() {
+            return new CompositeMeterRegistry();
         }
     }
 
