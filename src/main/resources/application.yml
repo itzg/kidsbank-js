@@ -6,7 +6,15 @@ spring:
   mvc:
     media-types:
       xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-  social:
-    facebook:
-      app-id: ${facebookAppId:}
-      app-secret: ${facebookAppSecret:}
+---
+spring:
+  profiles: MetricsToInflux
+  metrics:
+    export:
+      influx:
+        uri: http://localhost:8086
+        db: kidsbank
+        step: PT10S
+logging:
+  level:
+    io.micrometer.influx.InfluxMeterRegistry: warn

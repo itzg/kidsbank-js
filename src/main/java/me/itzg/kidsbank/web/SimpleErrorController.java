@@ -54,6 +54,8 @@ public class SimpleErrorController implements ErrorController {
                 return ResponseEntity.status((Integer) status)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(errorAttributes);
+            } else if ("/".equals(path)) {
+                return ResponseEntity.notFound().build();
             }
         }
 

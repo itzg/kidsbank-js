@@ -1,5 +1,6 @@
 package me.itzg.kidsbank.config;
 
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import me.itzg.kidsbank.users.AutoConnectionSignUp;
 import me.itzg.kidsbank.users.ParentsConnectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +19,23 @@ public class SocialConfig extends SocialConfigurerAdapter {
 
     private final AutoConnectionSignUp connectionSignUp;
     private final MongoTemplate mongoTemplate;
+    private CompositeMeterRegistry meterRegistry;
 
     @Autowired
-    public SocialConfig(AutoConnectionSignUp connectionSignUp, MongoTemplate mongoTemplate) {
+    public SocialConfig(AutoConnectionSignUp connectionSignUp,
+                        MongoTemplate mongoTemplate,
+                        CompositeMeterRegistry meterRegistry) {
         this.connectionSignUp = connectionSignUp;
         this.mongoTemplate = mongoTemplate;
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
     public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
         final ParentsConnectionRepository parentsConnectionRepository = new ParentsConnectionRepository(
                 connectionFactoryLocator,
-                mongoTemplate);
+                mongoTemplate,
+                meterRegistry);
         parentsConnectionRepository.setConnectionSignUp(connectionSignUp);
         return parentsConnectionRepository;
     }

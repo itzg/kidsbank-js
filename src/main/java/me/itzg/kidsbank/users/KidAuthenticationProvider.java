@@ -1,5 +1,7 @@
 package me.itzg.kidsbank.users;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import me.itzg.kidsbank.errors.BadCredentialFieldException;
 import me.itzg.kidsbank.services.KidlinkService;
 import me.itzg.kidsbank.types.Kid;
@@ -31,16 +33,24 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
     private final KidlinkService kidlinkService;
     private final MongoTemplate mongoTemplate;
     private final Validator validator;
+    private final Counter kidRegisterSuccess;
+    private final Counter kidLoginSuccess;
+    private CompositeMeterRegistry meterRegistry;
 
     @Autowired
     public KidAuthenticationProvider(PasswordEncoder passwordEncoder,
                                      KidlinkService kidlinkService,
                                      MongoTemplate mongoTemplate,
-                                     LocalValidatorFactoryBean validatorFactory) {
+                                     LocalValidatorFactoryBean validatorFactory,
+                                     CompositeMeterRegistry meterRegistry) {
         this.passwordEncoder = passwordEncoder;
         this.kidlinkService = kidlinkService;
         this.mongoTemplate = mongoTemplate;
         validator = validatorFactory.getValidator();
+        this.meterRegistry = meterRegistry;
+
+        kidRegisterSuccess = meterRegistry.counter("kid_register_success");
+        kidLoginSuccess = meterRegistry.counter("kid_login_success");
     }
 
     @Override
@@ -76,6 +86,7 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialFieldException("Invalid login", "password", "Wrong password");
         }
 
+        kidLoginSuccess.increment();
         return new KidAuthenticationToken(new AuthenticatedKid(kid),
                                           kidAuth,
                                           Collections.singletonList(Authorities.KID_AUTHORITY));
@@ -111,6 +122,7 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
         kid.setParents(Collections.singletonList(kidlink.getSharedBy()));
         mongoTemplate.save(kid);
 
+        kidRegisterSuccess.increment();
         return new KidAuthenticationToken(new AuthenticatedKid(kid),
                                           kidAuth,
                                           Collections.singletonList(Authorities.KID_AUTHORITY));

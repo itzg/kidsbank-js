@@ -1,7 +1,8 @@
 package me.itzg.kidsbank.services;
 
 import com.mongodb.bulk.BulkWriteResult;
-import me.itzg.kidsbank.config.KidsbankProperties;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import me.itzg.kidsbank.errors.NotFoundException;
 import me.itzg.kidsbank.repositories.TransactionRepository;
 import me.itzg.kidsbank.types.RestoreResults;
@@ -32,25 +33,32 @@ import java.util.List;
 @Service
 public class TransactionsService {
 
+    private final Counter cashFlowCounter;
+    private final Counter transactionsCounter;
     private MongoTemplate mongoTemplate;
-    private KidsbankProperties properties;
     private TransactionsFileProcessor transactionsFileProcessor;
     private TransactionRepository repository;
 
     @Autowired
-    public TransactionsService(MongoTemplate mongoTemplate, KidsbankProperties properties,
+    public TransactionsService(MongoTemplate mongoTemplate,
                                TransactionsFileProcessor transactionsFileProcessor,
-                               TransactionRepository repository) {
+                               TransactionRepository repository,
+                               CompositeMeterRegistry meterRegistry) {
         this.mongoTemplate = mongoTemplate;
-        this.properties = properties;
         this.transactionsFileProcessor = transactionsFileProcessor;
         this.repository = repository;
+
+        cashFlowCounter = meterRegistry.counter("cash_flow");
+        transactionsCounter = meterRegistry.counter("transactions");
     }
 
     @PreAuthorize("hasPermission(#transaction.accountId, 'Account', 'modifyEntries')")
     public Transaction createTransaction(Transaction transaction) {
 
         Assert.isNull(transaction.getId(), "This transaction already has an ID");
+
+        transactionsCounter.increment();
+        cashFlowCounter.increment(Math.abs(transaction.getAmount()));
         return repository.save(transaction);
     }
 
@@ -84,6 +92,8 @@ public class TransactionsService {
                                                             Transaction.class);
 
         transactions.forEach(transaction -> {
+            transactionsCounter.increment();
+            cashFlowCounter.increment(Math.abs(transaction.getAmount()));
             transaction.setAccountId(accountId);
             transaction.setCreationType(Transaction.CreationType.RESTORE);
         });
@@ -110,6 +120,8 @@ public class TransactionsService {
         stored.setDescription(transaction.getDescription());
         stored.setWhen(transaction.getWhen());
         stored.setAmount(transaction.getAmount());
+
+        // don't adjust cashflow counter since we'd also need the previous value...not worth the precision
 
         return repository.save(stored);
     }

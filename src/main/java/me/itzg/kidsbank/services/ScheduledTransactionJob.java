@@ -1,5 +1,6 @@
 package me.itzg.kidsbank.services;
 
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.repositories.ScheduledTransactionRepository;
 import me.itzg.kidsbank.types.ScheduledTransaction;
@@ -34,6 +35,9 @@ public class ScheduledTransactionJob extends QuartzJobBean {
     @Autowired
     private Timestamper timestamper;
 
+    @Autowired
+    private CompositeMeterRegistry meterRegistry;
+
     private ScheduledTransaction scheduledTransaction;
 
     public void setScheduledTransaction(ScheduledTransaction scheduledTransaction) {
@@ -43,6 +47,7 @@ public class ScheduledTransactionJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         log.debug("Executing enabled transaction for {}", scheduledTransaction);
+        meterRegistry.counter("scheduled_transaction_execution").increment();
 
         final PreAuthenticatedAuthenticationToken auth = new PreAuthenticatedAuthenticationToken(
                 scheduledTransaction.getParentId(),

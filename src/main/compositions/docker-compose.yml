@@ -28,11 +28,13 @@ services:
           - node.labels.volumes == main
 
   kidsbank:
-    image: itzg/kidsbank-js:0.3.0
+    image: itzg/kidsbank-js:0.3.1
     env_file:
       - social.env
     environment:
       SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_PROFILES_ACTIVE: MetricsToInflux
+
 
   haproxy:
     image: itzg/haproxy-lets

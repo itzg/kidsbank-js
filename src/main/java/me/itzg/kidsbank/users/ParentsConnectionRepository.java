@@ -1,5 +1,6 @@
 package me.itzg.kidsbank.users;
 
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.types.Parent;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -27,12 +28,15 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 public class ParentsConnectionRepository implements UsersConnectionRepository {
 
     private final MongoTemplate mongoTemplate;
+    private CompositeMeterRegistry meterRegistry;
     private final ConnectionFactoryLocator connectionFactoryLocator;
     private ConnectionSignUp connectionSignUp;
 
-    public ParentsConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator, MongoTemplate mongoTemplate) {
+    public ParentsConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator, MongoTemplate mongoTemplate,
+                                       CompositeMeterRegistry meterRegistry) {
         this.connectionFactoryLocator = connectionFactoryLocator;
         this.mongoTemplate = mongoTemplate;
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
@@ -61,6 +65,8 @@ public class ParentsConnectionRepository implements UsersConnectionRepository {
             }
         }
 
+        meterRegistry.counter("social_login", "provider", connectionKey.getProviderId())
+                .increment();
         log.info("Found user IDs={} with connection provider={}, user={}",
                  localUserIds, connectionKey.getProviderId(), connectionKey.getProviderUserId());
         return localUserIds;
