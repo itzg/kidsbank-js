@@ -1,20 +1,21 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Field, formValueSelector, propTypes, reduxForm} from 'redux-form';
-import {Button, Form, Input, Segment, Select} from 'semantic-ui-react';
+import {Button, Form, Input, Message, Segment, Select} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
-import {greaterThanZero, nonEmpty, number} from "../../../components/validators";
+import {dayOfMonth, nonEmpty, number} from "../../../components/validators";
 import ValidatedFormField from "../../../components/ValidatedFormField";
 import MoneyField from "../../../components/MoneyField";
 import {dayOfWeekOptions} from "../../../components/locale";
+import './CreateScheduledTransactionForm.css';
 
 class CreateScheduledTransactionForm extends Component {
 
   render() {
-    return <Segment secondary><Form onSubmit={this.props.handleSubmit}>
+    return <Segment secondary><Form onSubmit={this.props.handleSubmit} className='CreateScheduledTransactionForm'>
       <Field name='description' label='Description' component={ValidatedFormField} control={Input} validate={nonEmpty}/>
-      <Field name='amount' label='Amount' component={MoneyField} validate={number} width={2}/>
+      <Field name='amount' label='Amount' component={MoneyField} validate={number}/>
       {!this.props.intervalType &&
       <Form.Field>
         <label>Frequency</label>
@@ -37,10 +38,17 @@ class CreateScheduledTransactionForm extends Component {
       {this.props.intervalType === 'MONTHLY' &&
       <Form.Field>
         <label>Day of the month</label>
-        <Field name='monthly.dayOfMonth'
-               component={ValidatedFormField} control={Input} validate={greaterThanZero} width={1}/>
+        <Field name='monthly.dayOfMonth' className='dayOfMonth'
+               component={ValidatedFormField} control={Input} validate={dayOfMonth}/>
       </Form.Field>
       }
+
+      {
+        this.props.submitFailed && this.props.error &&
+        <Message negative
+                 content={this.props.error} header='Failed to create'/>
+      }
+
 
       <div>
         <Button type='submit' disabled={this.props.pristine || this.props.invalid}

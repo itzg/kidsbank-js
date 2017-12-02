@@ -32,7 +32,7 @@ public class ScheduledTransaction {
 
     float amount;
 
-    @NotEmpty
+    @NotEmpty(groups = ForCreate.class)
     String description;
 
     @NotNull(groups = ForCreate.class)
@@ -48,12 +48,12 @@ public class ScheduledTransaction {
     }
 
     @Data
-    public class Weekly {
+    public static class Weekly {
         int dayOfWeek;
     }
 
     @Data
-    public class Monthly {
+    public static class Monthly {
         int dayOfMonth;
     }
 

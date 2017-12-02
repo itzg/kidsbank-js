@@ -20,9 +20,9 @@ import {Field} from "redux-form";
  * @constructor
  */
 const ValidatedFormField = props => {
-  const {meta, input, label, control} = props;
+  const {meta, input, label, control, className} = props;
   return (
-    <Form.Field error={meta.invalid && meta.dirty} width={props.width}>
+    <Form.Field className={className} error={meta.invalid && meta.dirty} width={props.width}>
       {label && <label>{label}</label>}
       {control && React.createElement(control, {...input, ...props.controlProps, type: props.type})}
 
@@ -41,7 +41,8 @@ ValidatedFormField.propTypes = {
   controlProps: PropTypes.object,
   width: Form.Field.propTypes.width,
   warnWhenPristine: PropTypes.bool,
-  type: Form.Field.propTypes.type
+  type: Form.Field.propTypes.type,
+  className: PropTypes.string
 };
 
 export default ValidatedFormField;

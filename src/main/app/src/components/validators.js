@@ -13,3 +13,5 @@ export const number = value =>
 
 export const greaterThanZero = value =>
   value && isNaN(Number(value)) && value > 0 ? 'Must be 1 or greater' : undefined;
+export const dayOfMonth = value =>
+  value && isNaN(Number(value)) && value >= 1 && value <= 31 ? 'Must be a day of month, 1 - 31' : undefined;

@@ -38,9 +38,36 @@ public class ParentScheduledApi {
     public ScheduledTransaction createScheduledTransaction(Principal principal,
                                                            @PathVariable String accountId,
                                                            @RequestBody @Validated(ForCreate.class) ScheduledTransaction scheduledTransaction) throws SchedulerException {
+        validateDetails(scheduledTransaction);
         scheduledTransaction.setParentId(principal.getName());
         scheduledTransaction.setAccountId(accountId);
         return scheduledTransactionsService.create(scheduledTransaction);
+    }
+
+    private void validateDetails(ScheduledTransaction scheduledTransaction) {
+        if (scheduledTransaction.getAmount() == 0.0f) {
+            throw new IllegalArgumentException("Amount needs to be non-zero");
+        }
+
+        if (scheduledTransaction.getIntervalType() == null) {
+            throw new IllegalArgumentException("Interval type needs to be set");
+        }
+
+        switch (scheduledTransaction.getIntervalType()) {
+            case MONTHLY:
+                final int dayOfMonth = scheduledTransaction.getMonthly().getDayOfMonth();
+                if (dayOfMonth < 1 || dayOfMonth > 31) {
+                    throw new IllegalArgumentException("Invalid day of month");
+                }
+                break;
+
+            case WEEKLY:
+                final int dayOfWeek = scheduledTransaction.getWeekly().getDayOfWeek();
+                if (dayOfWeek < 1 || dayOfWeek > 7) {
+                    throw new IllegalArgumentException("Invalid day of week");
+                }
+                break;
+        }
     }
 
     @GetMapping("accounts/{accountId}/scheduled")

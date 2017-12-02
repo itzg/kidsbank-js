@@ -6,6 +6,10 @@ spring:
   mvc:
     media-types:
       xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+  metrics:
+    export:
+      influx:
+        enabled: false
 ---
 spring:
   profiles: MetricsToInflux
@@ -15,6 +19,7 @@ spring:
         uri: http://localhost:8086
         db: kidsbank
         step: PT10S
+        enabled: true
 logging:
   level:
     io.micrometer.influx.InfluxMeterRegistry: warn

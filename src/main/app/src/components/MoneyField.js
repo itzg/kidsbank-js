@@ -1,6 +1,7 @@
 import React from 'react';
 import {Input} from 'semantic-ui-react';
 import ValidatedFormField from './ValidatedFormField';
+import './MoneField.css';
 
 /**
  * MoneyField is a {@link ValidatedFormField} that visually decorates the input field itself with a currency label.
@@ -10,7 +11,7 @@ import ValidatedFormField from './ValidatedFormField';
  */
 export default function MoneyField(props) {
   return (
-    <ValidatedFormField {...props} control={Input} controlProps={{label: '$'}}/>
+    <ValidatedFormField className='MoneyField' {...props} control={Input} controlProps={{label: '$'}}/>
   );
 }
 

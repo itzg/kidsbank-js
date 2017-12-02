@@ -53,7 +53,11 @@ public class ScheduledTransactionsService {
 
         final List<ScheduledTransaction> scheduled = repository.findAll();
         for (ScheduledTransaction scheduledTransaction : scheduled) {
-            start(scheduledTransaction);
+            try {
+                start(scheduledTransaction);
+            } catch (SchedulerException | IllegalArgumentException e) {
+                log.warn("Failed to schedule transaction={}", scheduledTransaction, e);
+            }
         }
 
         scheduler.start();
@@ -64,7 +68,13 @@ public class ScheduledTransactionsService {
 
         scheduledTransaction = repository.save(scheduledTransaction);
 
-        return start(scheduledTransaction);
+        try {
+            return start(scheduledTransaction);
+        } catch (SchedulerException | IllegalArgumentException e) {
+            log.warn("Failed to start scheduled={}", scheduledTransaction, e);
+            repository.delete(scheduledTransaction);
+            throw e;
+        }
     }
 
     @PreAuthorize("hasPermission(#accountId, 'Account', 'readEntries')")
