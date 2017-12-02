@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import {fetchUserProfile, logoutUser} from '../../actions/user';
 import {Dropdown, Image, Loader, Menu, Responsive} from 'semantic-ui-react';
@@ -32,28 +32,30 @@ class Parents extends Component {
         </div>
       );
 
-      const accountsTab = [
-        <Responsive {...Responsive.onlyComputer} as={Route} key='top' path="/parent" render={(props) =>
-          <Menu.Item as={Link} to="/parent" active={props.match.isExact}>Accounts</Menu.Item>
-        }/>,
-        <Route key='detail' path="/parent/:section/:accountId" render={
-          (props) => <AccountSpecificTab
-            accountId={props.match.params.accountId}
-            onMissingAccount={() => props.history.replace('/parent')}
-            renderLabel={(account) => {
-              switch (props.match.params.section) {
-                case 'account':
-                  return `${account.name}'s Transactions`;
-                case 'manage':
-                  return `Manage ${account.name}'s Account`;
-                default:
-                  return null;
+      const accountsTab = (
+        <Fragment>
+          <Responsive {...Responsive.onlyComputer} as={Route} path="/parent" render={(props) =>
+            <Menu.Item as={Link} to="/parent" active={props.match.isExact}>Accounts</Menu.Item>
+          }/>
+          <Route path="/parent/:section/:accountId" render={
+            (props) => <AccountSpecificTab
+              accountId={props.match.params.accountId}
+              onMissingAccount={() => props.history.replace('/parent')}
+              renderLabel={(account) => {
+                switch (props.match.params.section) {
+                  case 'account':
+                    return `${account.name}'s Transactions`;
+                  case 'manage':
+                    return `Manage ${account.name}'s Account`;
+                  default:
+                    return null;
+                }
               }
-            }
-            }
-          />
-        }/>
-      ];
+              }
+            />
+          }/>
+        </Fragment>
+      );
 
       return (
         <div className="Parents">
