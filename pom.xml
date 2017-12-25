@@ -4,7 +4,7 @@
 
     <groupId>me.itzg</groupId>
     <artifactId>kidsbank-js</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.3.4</version>
     <packaging>jar</packaging>
 
     <name>kidsbank-js</name>
@@ -27,7 +27,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:itzg/kidsbank-js.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>0.3.4</tag>
     </scm>
 
     <dependencies>
