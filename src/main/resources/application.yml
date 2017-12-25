@@ -10,6 +10,7 @@ spring:
     export:
       influx:
         enabled: false
+logging.gelf.service: kidsbank
 ---
 spring:
   profiles: MetricsToInflux

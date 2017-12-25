@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+
+    <springProfile name="gelf">
+        <springProperty scope="context" name="GELF_SERVER" source="logging.gelf.server"
+                        defaultValue="localhost"/>
+        <springProperty scope="context" name="GELF_PORT" source="logging.gelf.port"
+                        defaultValue="12201"/>
+        <springProperty scope="context" name="GELF_PROTOCOL" source="logging.gelf.protocol"
+                        defaultValue="UDP"/>
+        <springProperty scope="context" name="GELF_INCLUDE_LEVELNAME" source="logging.gelf.includeLevelName"
+                        defaultValue="true"/>
+        <springProperty scope="context" name="GELF_SERVICE" source="logging.gelf.service"
+                        defaultValue="spring-boot-application"/>
+
+        <include resource="gelf-appender.xml"/>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="GELF"/>
+        </root>
+    </springProfile>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

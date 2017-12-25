@@ -28,14 +28,14 @@ services:
           - node.labels.volumes == main
 
   kidsbank:
-    image: itzg/kidsbank-js:0.3.2
+    image: itzg/kidsbank-js:0.3.3
     env_file:
       - social.env
       - metrics.env
     environment:
       SPRING_DATA_MONGODB_HOST: mongodb
-      SPRING_PROFILES_ACTIVE: MetricsToInflux
-
+      SPRING_PROFILES_ACTIVE: MetricsToInflux,gelf
+      LOGGING_GELF_SERVER: logstash
 
   haproxy:
     image: itzg/haproxy-lets
@@ -52,6 +52,18 @@ services:
         constraints:
           - node.labels.volumes == main
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:6.1.1
+    configs:
+      - source: logstash
+        target: /usr/share/logstash/pipeline/logstash.conf
+    environment:
+      LS_JAVA_OPTS: -Xms256m -Xmx256m
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
 volumes:
   mongodb_data:
   backup_mongodb:
@@ -61,3 +73,7 @@ volumes:
 secrets:
   rclone.conf:
     external: true
+
+configs:
+  logstash:
+    file: ./logstash.conf
