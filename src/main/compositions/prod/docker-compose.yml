@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.4"
 
 services:
   mongodb:
@@ -19,7 +19,7 @@ services:
     environment:
       HOST: mongodb
       INTERVAL: 43200
-      RCLONE_REMOTE_PATH:
+      RCLONE_CONFIG: /var/run/secrets/rclone.conf
     secrets:
       - rclone.conf
     deploy:
@@ -28,14 +28,15 @@ services:
           - node.labels.volumes == main
 
   kidsbank:
-    image: itzg/kidsbank-js:0.3.3
+    image: itzg/kidsbank-js:0.3.4
     env_file:
       - social.env
-      - metrics.env
     environment:
       SPRING_DATA_MONGODB_HOST: mongodb
-      SPRING_PROFILES_ACTIVE: MetricsToInflux,gelf
+      SPRING_PROFILES_ACTIVE: MetricsToTelegraf,gelf
       LOGGING_GELF_SERVER: logstash
+      LOGGING_LEVEL_ME_ITZG_KIDSBANK: debug
+      SPRING_METRICS_EXPORT_STATSD_HOST: telegraf
 
   haproxy:
     image: itzg/haproxy-lets
@@ -55,14 +56,36 @@ services:
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:6.1.1
     configs:
-      - source: logstash
+      - source: logstash2
         target: /usr/share/logstash/pipeline/logstash.conf
+    secrets:
+      - ca.pem
+      - logstash-client.pem
+      - logstash-client-key.pem
     environment:
       LS_JAVA_OPTS: -Xms256m -Xmx256m
+      LOG_LEVEL: debug
+    ports:
+      - 5550:5550
     deploy:
       resources:
         limits:
           memory: 512m
+
+  telegraf:
+    image: telegraf:1.5.0
+    secrets:
+      - ca.pem
+      - logstash-client.pem
+      - logstash-client-key.pem
+    configs:
+      - source: telegraf
+        target: /etc/telegraf/telegraf.conf
+        mode: 0660
+    ports:
+      - 127.0.0.1:8125:8125/udp
+    deploy:
+      mode: global
 
 volumes:
   mongodb_data:
@@ -73,7 +96,15 @@ volumes:
 secrets:
   rclone.conf:
     external: true
+  ca.pem:
+    external: true
+  logstash-client.pem:
+    external: true
+  logstash-client-key.pem:
+    external: true
 
 configs:
-  logstash:
-    file: ./logstash.conf
+  logstash2:
+    file: ./logstash2.conf
+  telegraf:
+    file: ./telegraf.conf

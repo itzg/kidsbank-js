@@ -11,6 +11,12 @@ services:
     image: influxdb:1.4.2
     ports:
       - 8086:8086
+  chronograf:
+    # NOTE: internally binds to 8888
+    image: chronograf:1.3.10
+    command: --influxdb-url=http://influxdb:8086
+    ports:
+      - 8888:8888
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:6.1.1
     volumes:
@@ -22,6 +28,14 @@ services:
       - 5555:5555
       - 12201:12201
       - 12201:12201/udp
+  telegraf:
+    image: telegraf:1.5.0
+    configs:
+      - source: telegraf
+        target: /etc/telegraf/telegraf.conf
+        mode: 0660
+    ports:
+      - 8125:8125/udp
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.1.1
     volumes:
@@ -49,3 +63,5 @@ volumes:
 configs:
   logstash:
     file: ./logstash.conf
+  telegraf:
+    file: ./telegraf.conf

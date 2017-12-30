@@ -24,3 +24,12 @@ spring:
 logging:
   level:
     io.micrometer.influx.InfluxMeterRegistry: warn
+---
+spring:
+  profiles: MetricsToStatsD
+  metrics:
+    export:
+      statsd:
+        enabled: true
+        host: localhost
+        flavor: telegraf
