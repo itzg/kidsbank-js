@@ -85,4 +85,3 @@ workflows:
   test_and_package:
     jobs:
       - test_and_package
-      - maven_release
