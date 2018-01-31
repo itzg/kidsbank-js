@@ -1,0 +1,13 @@
+output {
+    kafka {
+        codec => json
+        topic_id => "${KAFKA_TOPIC}"
+        bootstrap_servers => "${KAFKA_BOOTSTRAP_SERVERS}"
+        security_protocol => "SSL"
+        ssl_keystore_location => "${KAFKA_SSL_KEYSTORE}"
+        ssl_keystore_password => "NEEDS TO BE SET"
+        ssl_key_password => "NEEDS TO BE SET"
+        ssl_truststore_location => "${KAFKA_SSL_TRUSTSTORE}"
+        ssl_truststore_password => "NEEDS TO BE SET"
+    }
+}

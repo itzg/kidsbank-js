@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <included>
-    <appender name="GELF"
+    <appender name="GELF" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="GELF_BACKEND"/>
+    </appender>
+
+    <appender name="GELF_BACKEND"
               class="de.appelgriepsch.logback.GelfAppender">
         <server>${GELF_SERVER}</server>
         <port>${GELF_PORT}</port>

@@ -5,6 +5,11 @@ services:
     image: mongo:3.4
     volumes:
       - mongodb_data:/data/db
+    logging: &logToGelf
+      driver: gelf
+      options:
+        gelf-address: "udp://127.0.0.1:12201"
+        gelf-compression-type: gzip
     deploy:
       placement:
         constraints:
@@ -22,21 +27,27 @@ services:
       RCLONE_CONFIG: /var/run/secrets/rclone.conf
     secrets:
       - rclone.conf
+    logging: *logToGelf
     deploy:
       placement:
         constraints:
           - node.labels.volumes == main
 
   kidsbank:
-    image: itzg/kidsbank-js:0.3.4
+    image: itzg/kidsbank-js:0.3.5
     env_file:
       - social.env
     environment:
+      JAVA_TOOL_OPTIONS: -Xmx1024m -Xms512m
       SPRING_DATA_MONGODB_HOST: mongodb
-      SPRING_PROFILES_ACTIVE: MetricsToTelegraf,gelf
+      SPRING_PROFILES_ACTIVE: MetricsToStatsD
       LOGGING_GELF_SERVER: logstash
       LOGGING_LEVEL_ME_ITZG_KIDSBANK: debug
       SPRING_METRICS_EXPORT_STATSD_HOST: telegraf
+    deploy:
+      resources:
+        limits:
+          memory: 1200m
 
   haproxy:
     image: itzg/haproxy-lets
@@ -48,6 +59,7 @@ services:
     ports:
       - 80:80
       - 443:443
+    logging: *logToGelf
     deploy:
       placement:
         constraints:
@@ -56,21 +68,29 @@ services:
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:6.1.1
     configs:
-      - source: logstash2
+      - source: logstash_3
         target: /usr/share/logstash/pipeline/logstash.conf
     secrets:
-      - ca.pem
-      - logstash-client.pem
-      - logstash-client-key.pem
+      - source: logstash_out_kafka.conf
+        target: /usr/share/logstash/pipeline/logstash_out_kafka.conf
+      - ca-trust-store.jks
+      - kafka-client-keystore.p12
     environment:
-      LS_JAVA_OPTS: -Xms256m -Xmx256m
-      LOG_LEVEL: debug
+      LS_JAVA_OPTS: -Xms256m -Xmx512m
+      KAFKA_TOPIC: logs
+      KAFKA_BOOTSTRAP_SERVERS: kafka.itzg.me:5092,kafka.itzg.me:5093,kafka.itzg.me:5094
+      KAFKA_SSL_TRUSTSTORE: /run/secrets/ca-trust-store.jks
+      KAFKA_SSL_KEYSTORE: /run/secrets/kafka-client-keystore.p12
     ports:
-      - 5550:5550
+      # gelf
+      - 127.0.0.1:12201:12201/udp
+      # REST API
+      - 127.0.0.1:9600:9600
     deploy:
+      mode: global
       resources:
         limits:
-          memory: 512m
+          memory: 756m
 
   telegraf:
     image: telegraf:1.5.0
@@ -84,8 +104,28 @@ services:
         mode: 0660
     ports:
       - 127.0.0.1:8125:8125/udp
+    logging: *logToGelf
+
+  influxdb_proxy:
+    image: squareup/ghostunnel
+    command: >
+      client
+      --listen 0.0.0.0:8086
+      --unsafe-listen
+      --target influxdb.itzg.me:5086
+      --keystore /certs/logstash-client-bundle.pem
+      --cacert /certs/ca.pem
+    secrets:
+      # Can't use default /var/run/secrets since ghostunnel image is based on alpine
+      - source: ca.pem
+        target: /certs/ca.pem
+      - source: logstash-client-bundle.pem
+        target: /certs/logstash-client-bundle.pem
+    ports:
+      - 127.0.0.1:8086:8086
     deploy:
       mode: global
+
 
 volumes:
   mongodb_data:
@@ -102,9 +142,22 @@ secrets:
     external: true
   logstash-client-key.pem:
     external: true
+  logstash-client-bundle.pem:
+    external: true
+  logstash_out_kafka.conf:
+    external: true
+  ca-trust-store.jks:
+    external: true
+  ca-trust-store.cred:
+    external: true
+  kafka-client-keystore.p12:
+    external: true
+  kafka-client-keystore.cred:
+    external: true
+  
 
 configs:
-  logstash2:
-    file: ./logstash2.conf
+  logstash_3:
+    file: ./logstash.conf
   telegraf:
     file: ./telegraf.conf

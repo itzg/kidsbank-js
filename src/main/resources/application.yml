@@ -10,7 +10,10 @@ spring:
     export:
       influx:
         enabled: false
-logging.gelf.service: kidsbank
+logging:
+  gelf:
+    protocol: TCP
+    service: kidsbank
 ---
 spring:
   profiles: MetricsToInflux

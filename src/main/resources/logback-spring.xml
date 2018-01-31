@@ -20,8 +20,22 @@
         <include resource="gelf-appender.xml"/>
 
         <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="GELF"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="LogToLogstash">
+        <springProperty name="LOGSTASH_DEST" source="logging.logstash.destination"
+                        defaultValue="localhost:4560"/>
+
+        <appender name="STASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+            <destination>${LOGSTASH_DEST}</destination>
+
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        </appender>
+
+        <root>
+            <appender-ref ref="STASH"/>
         </root>
     </springProfile>
 
