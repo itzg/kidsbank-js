@@ -34,14 +34,14 @@ services:
           - node.labels.volumes == main
 
   kidsbank:
-    image: itzg/kidsbank-js:0.3.5
+    image: itzg/kidsbank-js:0.3.6
     env_file:
       - social.env
     environment:
       JAVA_TOOL_OPTIONS: -Xmx1024m -Xms512m
       SPRING_DATA_MONGODB_HOST: mongodb
-      SPRING_PROFILES_ACTIVE: MetricsToStatsD
-      LOGGING_GELF_SERVER: logstash
+      SPRING_PROFILES_ACTIVE: MetricsToStatsD,LogToLogstash
+      LOGGING_LOGSTASH_DESTINATION: logstash:4560
       LOGGING_LEVEL_ME_ITZG_KIDSBANK: debug
       SPRING_METRICS_EXPORT_STATSD_HOST: telegraf
     deploy:
@@ -50,7 +50,7 @@ services:
           memory: 1200m
 
   haproxy:
-    image: itzg/haproxy-lets
+    image: itzg/haproxy-lets:1.7-2
     env_file:
       - letencrypt.env
     volumes:
