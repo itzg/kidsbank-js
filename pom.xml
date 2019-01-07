@@ -4,7 +4,7 @@
 
     <groupId>me.itzg</groupId>
     <artifactId>kidsbank-js</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>kidsbank-js</name>
@@ -224,6 +224,10 @@
                 <configuration>
                     <to>
                         <image>itzg/kidsbank-js</image>
+                        <tags>
+                            <tag>latest</tag>
+                            <tag>${project.version}</tag>
+                        </tags>
                     </to>
                     <from>
                         <image>openjdk:8u181-jre-alpine</image>
