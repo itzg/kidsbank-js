@@ -1,0 +1,18 @@
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          linkedin:
+            authorization-uri: https://www.linkedin.com/oauth/v2/authorization
+            token-uri: https://www.linkedin.com/oauth/v2/accessToken
+            user-info-uri: https://api.linkedin.com/v2/me
+            user-name-attribute: id
+        registration:
+          linkedin:
+            scope: r_liteprofile
+            client-name: LinkedIn
+            authorization-grant-type: authorization_code
+            # post => include client_id in body of token request
+            client-authentication-method: post
+            redirect-uri-template: "{baseUrl}/{action}/oauth2/code/{registrationId}"

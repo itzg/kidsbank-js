@@ -1,5 +1,11 @@
 package me.itzg.kidsbank.users;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import java.util.Collections;
 import me.itzg.kidsbank.types.Account;
 import me.itzg.kidsbank.types.Parent;
 import me.itzg.kidsbank.types.Permissions;
@@ -10,15 +16,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Collections;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Geoff Bourne
@@ -36,8 +38,15 @@ public class KidsbankPermissionEvaluatorTest {
     private MongoTemplate mongoTemplate;
 
     @TestConfiguration
-    @Import(KidsbankPermissionEvaluator.class)
+    @Import({
+        KidsbankPermissionEvaluator.class,
+        ParentOAuth2DetailsLoader.class
+    })
     public static class Config {
+        @Bean
+        public MeterRegistry meterRegistry() {
+            return new SimpleMeterRegistry();
+        }
     }
 
     @Before

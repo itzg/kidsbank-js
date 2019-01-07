@@ -1,42 +1,50 @@
 package me.itzg.kidsbank.config;
 
+import static java.lang.String.format;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import me.itzg.kidsbank.users.Authorities;
+import me.itzg.kidsbank.users.DetailsDelegatingOAuth2AuthorizedClientRepository;
 import me.itzg.kidsbank.users.ImpersonateAuthFilter;
 import me.itzg.kidsbank.users.KidAuthenticationProvider;
 import me.itzg.kidsbank.users.KidLoginAuthFilter;
 import me.itzg.kidsbank.users.KidRegisterAuthFilter;
+import me.itzg.kidsbank.users.OAuth2DetailsLoader;
 import me.itzg.kidsbank.web.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
+import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
-import org.springframework.social.UserIdSource;
-import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.security.SocialAuthenticationFilter;
-import org.springframework.social.security.SocialAuthenticationProvider;
-import org.springframework.social.security.SocialAuthenticationServiceLocator;
-import org.springframework.social.security.SocialUserDetailsService;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import java.io.IOException;
-import java.util.Optional;
-
-import static java.lang.String.format;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Geoff Bourne
@@ -47,137 +55,152 @@ import static java.lang.String.format;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final SocialUserDetailsService userAccountService;
-    private final ObjectMapper objectMapper;
-    private final KidAuthenticationProvider kidAuthenticationProvider;
-    private Environment env;
+  private final ObjectMapper objectMapper;
+  private final KidAuthenticationProvider kidAuthenticationProvider;
+  private final RestTemplateBuilder restTemplateBuilder;
+  private final OAuth2DetailsLoader detailsLoader;
+  private final OAuth2AuthorizedClientRepository authorizedClientRepository;
+  private Environment env;
 
-    private final Optional<UserIdSource> userIdSource;
+  @Autowired
+  public WebSecurityConfig(ObjectMapper objectMapper,
+      @Nullable KidAuthenticationProvider kidAuthenticationProvider,
+      Environment env,
+      @Nullable RestTemplateBuilder restTemplateBuilder,
+      @Nullable OAuth2DetailsLoader detailsLoader,
+      @Nullable OAuth2AuthorizedClientRepository authorizedClientRepository) {
+    this.objectMapper = objectMapper;
+    this.kidAuthenticationProvider = kidAuthenticationProvider;
+    this.env = env;
+    this.restTemplateBuilder = restTemplateBuilder;
+    this.detailsLoader = detailsLoader;
+    this.authorizedClientRepository = authorizedClientRepository;
+  }
 
-    private final Optional<UsersConnectionRepository> usersConnectionRepository;
+  @SuppressWarnings("RedundantThrows")
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    web.ignoring()
+        .antMatchers(Paths.ROOT)
+        .antMatchers("/index.html")
+        .antMatchers("/favicon.ico")
+        .antMatchers("/static/**")
+        .antMatchers("/*.json")
+        .antMatchers("/*.js");
+  }
 
-    private final Optional<SocialAuthenticationServiceLocator> socialAuthenticationServiceLocator;
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http
+        .csrf().disable()
+        .authorizeRequests()
+          .antMatchers(format("%s/**", Paths.API_PARENT)).hasRole(Authorities.ROLE_PARENT)
+          .antMatchers(format("%s/**", Paths.API_KID)).hasRole(Authorities.ROLE_KID)
+          .antMatchers(format("%s/%s", Paths.API, Paths.CURRENT_USER)).permitAll()
+          .antMatchers(format("%s/**", Paths.SIGNIN)).permitAll()
+          .antMatchers("/error").permitAll()
+          .antMatchers(Paths.ROOT).permitAll()
+          .anyRequest().authenticated()
+        .and()
+        .logout().deleteCookies("JSESSIONID").logoutUrl(Paths.LOGOUT).logoutSuccessUrl(Paths.ROOT)
+    ;
 
-    @Autowired
-    public WebSecurityConfig(Optional<UserIdSource> userIdSource,
-                             Optional<UsersConnectionRepository> usersConnectionRepository,
-                             @SuppressWarnings({"SpringJavaAutowiringInspection", "SpringJavaInjectionPointsAutowiringInspection"})
-                                     Optional<SocialAuthenticationServiceLocator> socialAuthenticationServiceLocator,
-                             SocialUserDetailsService userAccountService,
-                             ObjectMapper objectMapper,
-                             KidAuthenticationProvider kidAuthenticationProvider,
-                             Environment env) {
-        this.userIdSource = userIdSource;
-        this.usersConnectionRepository = usersConnectionRepository;
-        this.socialAuthenticationServiceLocator = socialAuthenticationServiceLocator;
-        this.userAccountService = userAccountService;
-        this.objectMapper = objectMapper;
-        this.kidAuthenticationProvider = kidAuthenticationProvider;
-        this.env = env;
+    if (authorizedClientRepository != null && detailsLoader != null && restTemplateBuilder != null) {
+      http
+          .oauth2Login()
+            .loginPage(Paths.ROOT)
+            .userInfoEndpoint()
+              .userService(userService())
+              .userAuthoritiesMapper(userAuthoritiesMapper())
+            .and()
+            .tokenEndpoint().accessTokenResponseClient(accessTokenResponseClient())
+          .and()
+          .authorizedClientRepository(new DetailsDelegatingOAuth2AuthorizedClientRepository(
+              authorizedClientRepository,
+              detailsLoader
+          ))
+          ;
     }
 
-    @SuppressWarnings("RedundantThrows")
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .antMatchers(Paths.ROOT)
-                .antMatchers("/index.html")
-                .antMatchers("/favicon.ico")
-                .antMatchers("/static/**")
-                .antMatchers("/*.json")
-                .antMatchers("/*.js");
+    if (kidAuthenticationProvider != null) {
+      http
+          .addFilterBefore(kidRegistrationFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+          .addFilterBefore(kidLoginFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+          ;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers(format("%s/**", Paths.API_PARENT)).hasAuthority(Authorities.PARENT)
-                .antMatchers(format("%s/**", Paths.API_KID)).hasAuthority(Authorities.KID)
-                .antMatchers(format("%s/%s", Paths.API, Paths.CURRENT_USER)).permitAll()
-                .antMatchers(format("%s/**", Paths.SIGNIN)).permitAll()
-                .antMatchers("/connect/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilterBefore(socialAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class)
-                .addFilterBefore(kidRegistrationFilter(), AbstractPreAuthenticatedProcessingFilter.class)
-                .addFilterBefore(kidLoginFilter(), AbstractPreAuthenticatedProcessingFilter.class)
-                .logout().deleteCookies("JSESSIONID").logoutUrl(Paths.SIGNOUT).logoutSuccessUrl(Paths.ROOT)
-        ;
-
-        if (env.acceptsProfiles(Profiles.IMPERSONATE)) {
+    if (env.acceptsProfiles(Profiles.of(KidsbankProfiles.IMPERSONATE))) {
             http.addFilterBefore(new ImpersonateAuthFilter("/api/**"),
-                                 SocialAuthenticationFilter.class);
-        }
+                OAuth2LoginAuthenticationFilter.class);
     }
+  }
 
-    @Bean
-    public SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
+  private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+    final DefaultAuthorizationCodeTokenResponseClient tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+
+    final OAuth2AccessTokenResponseHttpMessageConverter messageConverter = new OAuth2AccessTokenResponseHttpMessageConverter();
+    final ConfigurableOAuth2AccessTokenResponseConverter tokenResponseConverter = new ConfigurableOAuth2AccessTokenResponseConverter();
+    tokenResponseConverter.setDefaultAccessTokenType(TokenType.BEARER);
+    messageConverter.setTokenResponseConverter(tokenResponseConverter);
+
+    RestTemplate restTemplate = new RestTemplate(Arrays.asList(
+        new FormHttpMessageConverter(), messageConverter));
+    restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+    tokenResponseClient.setRestOperations(restTemplate);
+
+    return tokenResponseClient;
+  }
+
+  private KidLoginAuthFilter kidLoginFilter() throws Exception {
+    final KidLoginAuthFilter filter = new KidLoginAuthFilter(Paths.KID_LOGIN, objectMapper);
+    filter.setAuthenticationManager(authenticationManager());
+    return filter;
+  }
+
+  private KidRegisterAuthFilter kidRegistrationFilter() throws Exception {
+    final KidRegisterAuthFilter filter = new KidRegisterAuthFilter(
+        Paths.KID_REGISTER, objectMapper);
+    filter.setAuthenticationManager(authenticationManager());
+    return filter;
+  }
+
+  @SuppressWarnings("RedundantThrows")
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    if (kidAuthenticationProvider != null) {
+      auth.authenticationProvider(kidAuthenticationProvider);
     }
+  }
 
-    private KidLoginAuthFilter kidLoginFilter() throws Exception {
-        final KidLoginAuthFilter filter = new KidLoginAuthFilter(Paths.KID_LOGIN, objectMapper);
-        filter.setAuthenticationManager(authenticationManager());
-        return filter;
-    }
+  private OAuth2UserService<OAuth2UserRequest, OAuth2User> userService() {
+    DefaultOAuth2UserService userService = new DefaultOAuth2UserService();
 
-    private KidRegisterAuthFilter kidRegistrationFilter() throws Exception {
-        final KidRegisterAuthFilter filter = new KidRegisterAuthFilter(Paths.KID_REGISTER, objectMapper);
-        filter.setAuthenticationManager(authenticationManager());
-        return filter;
-    }
+    MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(
+        objectMapper);
+    messageConverter.setSupportedMediaTypes(Collections.singletonList(
+        new MediaType("text", "javascript", StandardCharsets.UTF_8
+        )));
 
-    @SuppressWarnings("RedundantThrows")
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        if (usersConnectionRepository.isPresent()) {
-            auth.authenticationProvider(socialAuthenticationProvider());
-        }
-        auth.authenticationProvider(kidAuthenticationProvider);
-    }
+    userService.setRestOperations(
+        restTemplateBuilder
+            .additionalMessageConverters(messageConverter)
+            .build()
+    );
 
-    @Bean
-    public Filter socialAuthenticationFilter() throws Exception {
-        if (userIdSource.isPresent() && usersConnectionRepository.isPresent()
-                && socialAuthenticationServiceLocator.isPresent()) {
-            SocialAuthenticationFilter filter = new SocialAuthenticationFilter(
-                    authenticationManager(), userIdSource.get(),
-                    usersConnectionRepository.get(), socialAuthenticationServiceLocator.get());
-            filter.setFilterProcessesUrl(Paths.SIGNIN);
-            filter.setSignupUrl(null);
-            filter.setConnectionAddedRedirectUrl(Paths.PARENT);
-            filter.setPostLoginUrl(Paths.PARENT);
-            // ...otherwise it redirect back to the last 403'ed API call
-            filter.setAlwaysUsePostLoginUrl(true);
-            return filter;
-        } else {
-            return new NoopFilter();
-        }
-    }
+    return userService;
+  }
 
-    @Bean
-    @Lazy
-    public SocialAuthenticationProvider socialAuthenticationProvider() {
-        return new SocialAuthenticationProvider(usersConnectionRepository.orElseThrow(IllegalStateException::new),
-                                                userAccountService);
-    }
+  private GrantedAuthoritiesMapper userAuthoritiesMapper() {
+    return authorities -> authorities.stream()
+        .map(authority -> {
+          if (authority instanceof OAuth2UserAuthority) {
+            return new OAuth2UserAuthority(
+                Authorities.PARENT, ((OAuth2UserAuthority) authority).getAttributes());
+          } else {
+            return authority;
+          }
+        })
+        .collect(Collectors.toList());
+  }
 
-    private static class NoopFilter implements Filter {
-        @Override
-        public void init(FilterConfig filterConfig) throws ServletException {
-        }
-
-        @Override
-        public void doFilter(ServletRequest servletRequest,
-                             ServletResponse servletResponse,
-                             FilterChain filterChain) throws IOException, ServletException {
-            filterChain.doFilter(servletRequest, servletResponse);
-        }
-
-        @Override
-        public void destroy() {
-        }
-    }
 }

@@ -3,27 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "react-scripts": "1.0.17"
+    "http-proxy-middleware": "^0.19.1",
+    "react-scripts": "^2.1.1"
   },
   "dependencies": {
     "history": "^4.7.2",
-    "lodash": "^4.17.4",
-    "moment": "^2.19.3",
+    "lodash": "^4.17.5",
+    "moment": "^2.20.1",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-copy-to-clipboard": "^5.0.1",
-    "react-datepicker": "^0.61.0",
+    "react-datepicker": "^0.64.0",
     "react-dom": "^16.2.0",
     "react-notification-system": "^0.2.16",
-    "react-redux": "^5.0.6",
+    "react-redux": "^4.4.9",
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2",
-    "redux-form": "^7.2.0",
+    "redux-form": "^7.4.2",
     "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "semantic-ui-css": "^2.2.12",
-    "semantic-ui-react": "^0.77.0"
+    "semantic-ui-css": "^2.2.14",
+    "semantic-ui-react": "^0.83.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -31,21 +32,11 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "proxy": {
-    "/signin": {
-      "target": "http://localhost:8080"
-    },
-    "/signout": {
-      "target": "http://localhost:8080"
-    },
-    "/kid-register": {
-      "target": "http://localhost:8080"
-    },
-    "/kid-login": {
-      "target": "http://localhost:8080"
-    },
-    "/api": {
-      "target": "http://localhost:8080"
-    }
-  }
+  "proxy": "http://localhost:8080",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

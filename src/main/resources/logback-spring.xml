@@ -25,6 +25,7 @@
     </springProfile>
 
     <springProfile name="LogToLogstash">
+        <!-- places the Spring property logging.logstash.destination into the logstash var LOGSTASH_DEST -->
         <springProperty name="LOGSTASH_DEST" source="logging.logstash.destination"
                         defaultValue="localhost:4560"/>
 
@@ -36,6 +37,21 @@
 
         <root>
             <appender-ref ref="STASH"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="LogToGCP">
+
+        <appender name="GCP" class="com.google.cloud.logging.logback.LoggingAppender">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+            </filter>
+            <log>application.log</log>
+            <flushLevel>WARN</flushLevel> <!-- Optional : default ERROR -->
+        </appender>
+
+        <root>
+            <appender-ref ref="GCP"/>
         </root>
     </springProfile>
 

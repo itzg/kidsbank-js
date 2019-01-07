@@ -4,35 +4,17 @@ spring:
       database: kidsbank
       host: ${mongodbHost:localhost}
   mvc:
-    media-types:
-      xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-  metrics:
-    export:
-      influx:
-        enabled: false
+    contentnegotiation:
+      media-types:
+        xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 logging:
   gelf:
     protocol: TCP
     service: kidsbank
----
-spring:
-  profiles: MetricsToInflux
+management:
   metrics:
     export:
       influx:
-        uri: http://localhost:8086
-        db: kidsbank
-        step: PT10S
-        enabled: true
-logging:
-  level:
-    io.micrometer.influx.InfluxMeterRegistry: warn
----
-spring:
-  profiles: MetricsToStatsD
-  metrics:
-    export:
+        enabled: false
       statsd:
-        enabled: true
-        host: localhost
-        flavor: telegraf
+        enabled: false

@@ -1,19 +1,5 @@
 package me.itzg.kidsbank.web;
 
-import me.itzg.kidsbank.services.TransactionsService;
-import me.itzg.kidsbank.types.Transaction;
-import me.itzg.kidsbank.users.Authorities;
-import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.any;
@@ -24,6 +10,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import me.itzg.kidsbank.repositories.ParentRepository;
+import me.itzg.kidsbank.services.TransactionsService;
+import me.itzg.kidsbank.types.Transaction;
+import me.itzg.kidsbank.users.Authorities;
+import me.itzg.kidsbank.users.ParentOAuth2DetailsLoader;
+import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
 /**
  * @author Geoff Bourne
  * @since Oct 2017
@@ -31,6 +39,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(ParentTransactionsApi.class)
 public class ParentTransactionsApiTest {
+
+    @TestConfiguration
+    @Import({ParentOAuth2DetailsLoader.class})
+    static class Config {
+        @MockBean
+        private MongoTemplate mongoTemplate;
+
+        @MockBean
+        private ParentRepository parentRepository;
+
+        @Bean
+        MeterRegistry meterRegistry() {
+            return new SimpleMeterRegistry();
+        }
+    }
 
     @Autowired
     private MockMvc mvc;

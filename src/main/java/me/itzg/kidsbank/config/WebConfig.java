@@ -1,11 +1,11 @@
 package me.itzg.kidsbank.config;
 
+import me.itzg.kidsbank.web.ExcelView;
 import me.itzg.kidsbank.web.Slf4jRequestLoggingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -22,10 +22,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer
-                .defaultContentType(MediaType.APPLICATION_JSON)
-                .favorPathExtension(true);
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        registry.enableContentNegotiation(
+            new ExcelView()
+        );
     }
 
     @Bean

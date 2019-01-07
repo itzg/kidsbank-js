@@ -1,7 +1,11 @@
 package me.itzg.kidsbank.users;
 
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Collections;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import me.itzg.kidsbank.errors.BadCredentialFieldException;
 import me.itzg.kidsbank.services.KidlinkService;
 import me.itzg.kidsbank.types.Kid;
@@ -18,11 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import java.util.Collections;
-import java.util.Set;
-
 /**
  * @author Geoff Bourne
  * @since Oct 2017
@@ -35,19 +34,17 @@ public class KidAuthenticationProvider implements AuthenticationProvider {
     private final Validator validator;
     private final Counter kidRegisterSuccess;
     private final Counter kidLoginSuccess;
-    private CompositeMeterRegistry meterRegistry;
 
     @Autowired
     public KidAuthenticationProvider(PasswordEncoder passwordEncoder,
                                      KidlinkService kidlinkService,
                                      MongoTemplate mongoTemplate,
                                      LocalValidatorFactoryBean validatorFactory,
-                                     CompositeMeterRegistry meterRegistry) {
+                                     MeterRegistry meterRegistry) {
         this.passwordEncoder = passwordEncoder;
         this.kidlinkService = kidlinkService;
         this.mongoTemplate = mongoTemplate;
         validator = validatorFactory.getValidator();
-        this.meterRegistry = meterRegistry;
 
         kidRegisterSuccess = meterRegistry.counter("kid_register_success");
         kidLoginSuccess = meterRegistry.counter("kid_login_success");

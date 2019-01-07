@@ -2,7 +2,9 @@ package me.itzg.kidsbank.services;
 
 import com.mongodb.bulk.BulkWriteResult;
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.io.IOException;
+import java.util.List;
 import me.itzg.kidsbank.errors.NotFoundException;
 import me.itzg.kidsbank.repositories.TransactionRepository;
 import me.itzg.kidsbank.types.RestoreResults;
@@ -23,9 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.List;
-
 /**
  * @author Geoff Bourne
  * @since Oct 2017
@@ -43,7 +42,7 @@ public class TransactionsService {
     public TransactionsService(MongoTemplate mongoTemplate,
                                TransactionsFileProcessor transactionsFileProcessor,
                                TransactionRepository repository,
-                               CompositeMeterRegistry meterRegistry) {
+                               MeterRegistry meterRegistry) {
         this.mongoTemplate = mongoTemplate;
         this.transactionsFileProcessor = transactionsFileProcessor;
         this.repository = repository;

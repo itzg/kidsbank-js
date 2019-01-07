@@ -1,21 +1,23 @@
 package me.itzg.kidsbank.web;
 
+import java.security.Principal;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import me.itzg.kidsbank.types.ParentUserDetails;
 import me.itzg.kidsbank.types.Profile;
 import me.itzg.kidsbank.types.Role;
 import me.itzg.kidsbank.users.Authorities;
 import me.itzg.kidsbank.users.KidAuthenticationToken;
+import me.itzg.kidsbank.users.OAuth2UserProfiler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.social.security.SocialAuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.security.Principal;
 
 /**
  * @author Geoff Bourne
@@ -26,26 +28,37 @@ import java.security.Principal;
 @Slf4j
 public class CommonApi {
 
+    private final OAuth2UserProfiler oAuth2Profiler;
+
+    @Autowired
+    public CommonApi(OAuth2UserProfiler oAuth2Profiler) {
+        this.oAuth2Profiler = oAuth2Profiler;
+    }
+
     @GetMapping(Paths.CURRENT_USER)
     public ResponseEntity<Profile> currentUser(Principal principal,
                                                HttpServletRequest request) {
-        if (principal instanceof SocialAuthenticationToken) {
-            final SocialAuthenticationToken token = (SocialAuthenticationToken) principal;
+        if (principal instanceof OAuth2AuthenticationToken) {
+            final OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) principal;
             final Profile profile = new Profile();
 
-            profile.setUserId(token.getName());
-            try {
-                profile.setDisplayName(token.getConnection().getDisplayName());
-            } catch (NullPointerException e) {
-                log.warn("Failed to access social display name", e);
-                forceLogout(request);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            final Object details = token.getDetails();
+            if (details instanceof ParentUserDetails) {
+                profile.setUserId(((ParentUserDetails) details).getId());
             }
-            profile.setProfileImageUrl(token.getConnection().getImageUrl());
-            if (token.getAuthorities().contains(Authorities.PARENT_AUTHORITY)) {
+            else {
+                throw new IllegalStateException(
+                    "Expected auth token details to be a ParentUserDetails");
+            }
+
+
+            profile.setDisplayName(oAuth2Profiler.getDisplayName(token));
+//            profile.setProfileImageUrl(token.getConnection().getImageUrl());
+            if (token.getAuthorities().stream().anyMatch(grantedAuthority ->
+                grantedAuthority.getAuthority().equals(Authorities.PARENT))) {
                 profile.setRole(Role.PARENT);
             } else {
-                throw new IllegalStateException("Social login is in use, but wrong authority");
+                throw new IllegalStateException("OAuth2 login is in use, but wrong authority");
             }
 
             return ResponseEntity.ok(profile);

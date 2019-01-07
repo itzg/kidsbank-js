@@ -52,7 +52,7 @@ export function loginParent(provider) {
   return (dispatch) => {
     dispatch(loginParentStart(provider));
 
-    window.location = `/signin/${provider}`;
+    window.location = `/oauth2/authorization/${provider}`;
   }
 }
 
@@ -115,7 +115,7 @@ export function registerKid(username, password, kidlinkCode) {
 
 export function logoutUser() {
   return () => {
-    window.location = '/signout';
+    window.location = '/logout';
   }
 }
 

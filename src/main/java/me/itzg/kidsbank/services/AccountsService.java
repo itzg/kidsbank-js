@@ -1,6 +1,15 @@
 package me.itzg.kidsbank.services;
 
+import static me.itzg.kidsbank.types.Transaction.FIELD_ACCOUNT_ID;
+import static me.itzg.kidsbank.types.Transaction.FIELD_AMOUNT;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
 import com.mongodb.client.result.UpdateResult;
+import java.util.Collections;
+import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.errors.NotFoundException;
@@ -20,17 +29,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-
-import static me.itzg.kidsbank.types.Transaction.FIELD_ACCOUNT_ID;
-import static me.itzg.kidsbank.types.Transaction.FIELD_AMOUNT;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
 /**
+ * Provides operations for the per-kid accounts managed by parents.
+ *
  * @author Geoff Bourne
  * @since Sep 2017
  */

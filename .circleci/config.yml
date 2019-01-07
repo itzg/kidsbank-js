@@ -3,11 +3,8 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 defaults: &defaults
-  working_directory: /tmp
   docker:
     - image: circleci/openjdk:8-jdk
-
-  working_directory: ~/repo
 
   environment:
     MAVEN_OPTS: -Xmx3200m
@@ -44,10 +41,12 @@ jobs:
             - src/main/app/node_modules
           key: npm-dependencies-{{ checksum "src/main/app/package.json" }}
 
-      - setup_remote_docker
-
       # includes package goal
-      - run: mvn -s settings.xml -Ddockerfile.useMavenSettingsForAuth=true integration-test
+      - run: >
+          mvn
+          -s settings.xml
+          integration-test
+          jib:build
 
       - run: |
           mkdir -p /tmp/jars

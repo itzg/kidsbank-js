@@ -1,5 +1,6 @@
 package me.itzg.kidsbank.users;
 
+import java.io.Serializable;
 import me.itzg.kidsbank.types.Kid;
 import me.itzg.kidsbank.types.Parent;
 import me.itzg.kidsbank.types.Permissions;
@@ -14,8 +15,6 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
-
 /**
  * This component declares the object type permissions referenced in <code>hasPermission</code> usage within
  * {@link org.springframework.security.access.prepost.PreAuthorize} annotations.
@@ -27,10 +26,13 @@ import java.io.Serializable;
 public class KidsbankPermissionEvaluator implements PermissionEvaluator {
 
     private final MongoTemplate mongoTemplate;
+    private final ParentOAuth2DetailsLoader detailsLoader;
 
     @Autowired
-    public KidsbankPermissionEvaluator(MongoTemplate mongoTemplate) {
+    public KidsbankPermissionEvaluator(MongoTemplate mongoTemplate,
+        ParentOAuth2DetailsLoader detailsLoader) {
         this.mongoTemplate = mongoTemplate;
+        this.detailsLoader = detailsLoader;
     }
 
     @Override
@@ -45,7 +47,8 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
                                  Object permission) {
 
         final boolean isParent = isParentAuthentication(authentication);
-        final String userId = authentication.getName();
+        final String userId =
+            isParent ? detailsLoader.extractParentId(authentication) : authentication.getName();
 
         switch (targetType) {
             case Types.ACCOUNT:
@@ -132,7 +135,8 @@ public class KidsbankPermissionEvaluator implements PermissionEvaluator {
     }
 
     private boolean isParentAuthentication(Authentication authentication) {
-        return authentication.getAuthorities().contains(Authorities.PARENT_AUTHORITY);
+        return authentication.getAuthorities().stream()
+            .anyMatch(granted -> granted.getAuthority().equals(Authorities.PARENT));
     }
 
     private boolean parentHasAccount(String parentUserId, String accountId) {

@@ -1,9 +1,12 @@
 package me.itzg.kidsbank.web;
 
+import java.security.Principal;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.services.ScheduledTransactionsService;
 import me.itzg.kidsbank.types.ForCreate;
 import me.itzg.kidsbank.types.ScheduledTransaction;
+import me.itzg.kidsbank.users.ParentOAuth2DetailsLoader;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -15,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-import java.util.List;
-
 /**
  * @author Geoff Bourne
  * @since Oct 2017
@@ -28,10 +28,13 @@ import java.util.List;
 public class ParentScheduledApi {
 
     private ScheduledTransactionsService scheduledTransactionsService;
+    private final ParentOAuth2DetailsLoader detailsLoader;
 
     @Autowired
-    public ParentScheduledApi(ScheduledTransactionsService scheduledTransactionsService) {
+    public ParentScheduledApi(ScheduledTransactionsService scheduledTransactionsService,
+        ParentOAuth2DetailsLoader detailsLoader) {
         this.scheduledTransactionsService = scheduledTransactionsService;
+        this.detailsLoader = detailsLoader;
     }
 
     @PostMapping("accounts/{accountId}/scheduled")
@@ -39,7 +42,7 @@ public class ParentScheduledApi {
                                                            @PathVariable String accountId,
                                                            @RequestBody @Validated(ForCreate.class) ScheduledTransaction scheduledTransaction) throws SchedulerException {
         validateDetails(scheduledTransaction);
-        scheduledTransaction.setParentId(principal.getName());
+        scheduledTransaction.setParentId(detailsLoader.extractParentId(principal));
         scheduledTransaction.setAccountId(accountId);
         return scheduledTransactionsService.create(scheduledTransaction);
     }

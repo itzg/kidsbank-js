@@ -1,7 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Header} from 'semantic-ui-react';
-import {FacebookLoginAction, GithubLoginAction, LinkedInLoginAction, TwitterLoginAction} from './ProviderLoginActions';
+import {
+  FacebookLoginAction,
+  GithubLoginAction,
+  LinkedInLoginAction
+} from './ProviderLoginActions';
 import './ParentLogin.css';
 
 class ParentLogin extends Component {
@@ -17,7 +21,6 @@ class ParentLogin extends Component {
           <FacebookLoginAction onLogin={this.props.onLogin} lastUsedProvider={this.props.lastUsedProvider}/>
           <GithubLoginAction onLogin={this.props.onLogin} lastUsedProvider={this.props.lastUsedProvider}/>
           <LinkedInLoginAction onLogin={this.props.onLogin} lastUsedProvider={this.props.lastUsedProvider}/>
-          <TwitterLoginAction onLogin={this.props.onLogin} lastUsedProvider={this.props.lastUsedProvider}/>
         </div>
 
       </div>

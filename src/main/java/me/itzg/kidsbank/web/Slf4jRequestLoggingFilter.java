@@ -1,11 +1,10 @@
 package me.itzg.kidsbank.web;
 
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.AbstractRequestLoggingFilter;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Geoff Bourne
@@ -31,6 +30,6 @@ public class Slf4jRequestLoggingFilter extends AbstractRequestLoggingFilter impl
     @Override
     public int getOrder() {
         // use magic offset like other filters to place this before security filter chain
-        return FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER - 104;
+        return OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER - 104;
     }
 }

@@ -1,0 +1,49 @@
+version: '3.4'
+
+services:
+  influxdb:
+    image: influxdb:1.6.4
+    ports:
+      - 8086:8086
+    volumes:
+      - influxdb:/var/lib/influxdb
+  chronograf:
+    image: chronograf:1.6.2
+    command: --influxdb-url=http://influxdb:8086
+    ports:
+      - 8888:8888
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:${ELASTIC_VERSION:-6.4.2}
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    environment:
+      LS_JAVA_OPTS: -Xms256m -Xmx256m
+    ports:
+      - 9600:9600
+      - 4560:4560
+      - 12201:12201
+      - 12201:12201/udp
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-6.4.2}
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=localhost
+      - network.host=0.0.0.0
+      # Disable X-Pack security: https://www.elastic.co/guide/en/elasticsearch/reference/5.5/security-settings.html#general-security-settings
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:${ELASTIC_VERSION:-6.4.2}
+    ports:
+      - 5601:5601
+
+volumes:
+  mongodb_data:
+  es_data:
+  influxdb:

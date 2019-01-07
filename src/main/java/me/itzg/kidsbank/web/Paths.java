@@ -7,7 +7,7 @@ package me.itzg.kidsbank.web;
 public class Paths {
     public static final String SIGNIN = "/signin";
     public static final String PARENT = "/parent";
-    public static final String SIGNOUT = "/signout";
+    public static final String LOGOUT = "/logout";
     public static final String ROOT = "/";
     public static final String API = "/api";
     public static final String CURRENT_USER = "currentUser";

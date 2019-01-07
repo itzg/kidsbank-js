@@ -4,7 +4,7 @@ package me.itzg.kidsbank.config;
  * @author Geoff Bourne
  * @since Oct 2017
  */
-public class Profiles {
+public class KidsbankProfiles {
     /**
      * Enable development-time security filters for easily impersonating any user IDs.
      */
