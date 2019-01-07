@@ -139,11 +139,14 @@
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20</version>
+                <version>2.22.1</version>
                 <configuration>
                     <systemProperties>
                         <user.timezone>UTC</user.timezone>
                     </systemProperties>
+                    <!-- disabling this to resolve build issue on Linux:
+              Error: Could not find or load main class org.apache.maven.surefire.booter.ForkedBooter -->
+                    <useSystemClassLoader>false</useSystemClassLoader>
                 </configuration>
             </plugin>
 
