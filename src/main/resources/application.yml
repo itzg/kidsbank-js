@@ -18,3 +18,5 @@ management:
         enabled: false
       statsd:
         enabled: false
+      stackdriver:
+        enabled: false
