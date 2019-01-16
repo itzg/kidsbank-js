@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.0.RELEASE</version>
+        <version>2.1.2.RELEASE</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
@@ -153,9 +153,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.1</version>
                 <configuration>
-                    <systemProperties>
-                        <user.timezone>UTC</user.timezone>
-                    </systemProperties>
                     <!-- disabling this to resolve build issue on Linux:
               Error: Could not find or load main class org.apache.maven.surefire.booter.ForkedBooter -->
                     <useSystemClassLoader>false</useSystemClassLoader>
@@ -173,22 +170,35 @@
                     <execution>
                         <id>install node and npm</id>
                         <goals>
-                            <goal>install-node-and-npm</goal>
+                            <goal>install-node-and-yarn</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v9.2.0</nodeVersion>
+                            <nodeVersion>v11.6.0</nodeVersion>
+                            <yarnVersion>v1.12.3</yarnVersion>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>npm install</id>
+                        <id>frontend install</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>yarn</goal>
                         </goals>
                     </execution>
+<!-- if there were frontend tests...
                     <execution>
-                        <id>react build</id>
+                        <id>frontend test</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>yarn</goal>
+                        </goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <arguments>run test</arguments>
+                        </configuration>
+                    </execution>
+-->
+                    <execution>
+                        <id>frontend build</id>
+                        <goals>
+                            <goal>yarn</goal>
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
