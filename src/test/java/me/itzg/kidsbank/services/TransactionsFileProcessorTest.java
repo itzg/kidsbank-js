@@ -1,21 +1,21 @@
 package me.itzg.kidsbank.services;
 
-import me.itzg.kidsbank.types.ExtendedContentTypes;
-import me.itzg.kidsbank.types.Transaction;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.mock.web.MockMultipartFile;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
+import java.util.TimeZone;
+import me.itzg.kidsbank.types.ExtendedContentTypes;
+import me.itzg.kidsbank.types.Transaction;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mock.web.MockMultipartFile;
 
 /**
  * @author Geoff Bourne
@@ -23,9 +23,21 @@ import static org.junit.Assume.assumeThat;
  */
 public class TransactionsFileProcessorTest {
 
+    private TimeZone defaultTz;
+
+    @Before
+    public void setUp() throws Exception {
+        defaultTz = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        TimeZone.setDefault(defaultTz);
+    }
+
     @Test
     public void testNormalFile() throws IOException, InvalidFormatException {
-        assumeThat(System.getProperty("user.timezone"), is("UTC"));
         final ClassPathResource resource = new ClassPathResource("transactions.xlsx");
         try (InputStream inputStream = resource.getInputStream()) {
             final MockMultipartFile multipartFile = new MockMultipartFile("transactions.xlsx",
@@ -37,12 +49,12 @@ public class TransactionsFileProcessorTest {
             final List<Transaction> transactions = processor.process(multipartFile);
             assertThat(transactions, Matchers.hasSize(12));
 
-            assertEquals(1508081856000L, transactions.get(0).getWhen().getTime());
             assertEquals("Nonjob", transactions.get(0).getDescription());
+            assertEquals(1508081856000L, transactions.get(0).getWhen().getTime());
             assertEquals(100f, transactions.get(0).getAmount(), 0.001);
 
-            assertEquals(1506958486000L, transactions.get(11).getWhen().getTime());
             assertEquals("old thing", transactions.get(11).getDescription());
+            assertEquals(1506958486000L, transactions.get(11).getWhen().getTime());
             assertEquals(-3.45f, transactions.get(11).getAmount(), 0.001);
         }
     }
