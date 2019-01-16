@@ -1,11 +1,12 @@
 package me.itzg.kidsbank.config;
 
+import java.util.Locale;
 import me.itzg.kidsbank.web.ExcelView;
-import me.itzg.kidsbank.web.Slf4jRequestLoggingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -17,25 +18,18 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("/index.html");
         registry.addViewController("/parent/**").setViewName("/index.html");
         registry.addViewController("/kid/**").setViewName("/index.html");
     }
 
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-        registry.enableContentNegotiation(
-            new ExcelView()
-        );
-    }
-
     @Bean
-    public Slf4jRequestLoggingFilter loggingFilter() {
-        final Slf4jRequestLoggingFilter filter = new Slf4jRequestLoggingFilter();
-        filter.setIncludeHeaders(true);
-        filter.setIncludePayload(true);
-        filter.setMaxPayloadLength(100);
-        filter.setBeforeMessagePrefix("BEFORE : ");
-        filter.setAfterMessagePrefix("AFTER : ");
-        return filter;
+    public ViewResolver excelViewResolver() {
+        return new ViewResolver() {
+            @Override
+            public View resolveViewName(String viewName, Locale locale) throws Exception {
+                return new ExcelView();
+            }
+        };
     }
 }
