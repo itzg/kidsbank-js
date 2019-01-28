@@ -9,7 +9,15 @@ spring:
             user-info-uri: https://api.linkedin.com/v2/me
             user-name-attribute: id
         registration:
+          facebook:
+            client-id: ${facebook-client-id}
+            client-secret: ${facebook-client-secret}
+          github:
+            client-id: ${github-client-id}
+            client-secret: ${github-client-secret}
           linkedin:
+            client-id: ${linked-client-id}
+            client-secret: ${linked-client-secret}
             scope: r_liteprofile
             client-name: LinkedIn
             authorization-grant-type: authorization_code
