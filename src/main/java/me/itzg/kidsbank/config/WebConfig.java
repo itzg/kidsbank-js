@@ -1,10 +1,9 @@
 package me.itzg.kidsbank.config;
 
-import java.util.Locale;
+import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.web.ExcelView;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -14,6 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @since Oct 2017
  */
 @Configuration
+@Slf4j
 public class WebConfig implements WebMvcConfigurer {
 
     @Override
@@ -25,11 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Bean
     public ViewResolver excelViewResolver() {
-        return new ViewResolver() {
-            @Override
-            public View resolveViewName(String viewName, Locale locale) throws Exception {
-                return new ExcelView();
-            }
-        };
+        log.info("Registering Excel view resolver");
+        return (viewName, locale) -> new ExcelView();
     }
 }
