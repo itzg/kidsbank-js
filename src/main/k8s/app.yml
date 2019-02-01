@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kidsbank-app
+  labels:
+    app: kidsbank-app
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: kidsbank-app
+      labels:
+        app: kidsbank-app
+      annotations:
+        deployed: "2019-01-31T09:00"
+    spec:
+      containers:
+        - name: kidsbank-app
+          image: itzg/kidsbank-js:0.5-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xmx1024m -Xms512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+            - name: SPRING_PROFILES_ACTIVE
+              value: oauth2
+            - name: SERVER_USE_FORWARD_HEADERS
+              value: "true"
+            - name: SPRING_DATA_MONGODB_HOST
+              value: kidsbank-mongo-0.kidsbank-mongo
+            - name: FACEBOOK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: kidsbank-social-facebook
+            - name: FACEBOOK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: client-secret
+                  name: kidsbank-social-facebook
+            - name: GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: kidsbank-social-github
+            - name: GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: client-secret
+                  name: kidsbank-social-github
+            - name: LINKED_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: kidsbank-social-linkedin
+            - name: LINKED_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: client-secret
+                  name: kidsbank-social-linkedin
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: kidsbank-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kidsbank
+spec:
+  selector:
+    app: kidsbank-app
+  ports:
+    - port: 8080
