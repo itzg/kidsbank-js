@@ -26,6 +26,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public ViewResolver excelViewResolver() {
         log.info("Registering Excel view resolver");
-        return (viewName, locale) -> new ExcelView();
+        return (viewName, locale) -> viewName.endsWith(".xlsx") ? new ExcelView() : null;
     }
 }
