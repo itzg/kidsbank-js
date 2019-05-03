@@ -55,7 +55,7 @@ jobs:
           path: /tmp/jars
           destination: jars
 
-  maven_release:
+  release:
     <<: *defaults
 
     steps:
