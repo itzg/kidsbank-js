@@ -1,6 +1,8 @@
 package me.itzg.kidsbank.services;
 
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.repositories.ScheduledTransactionRepository;
 import me.itzg.kidsbank.types.ScheduledTransaction;
@@ -15,8 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-
 /**
  * @author Geoff Bourne
  * @since Oct 2017
@@ -26,19 +26,26 @@ import java.util.Collections;
 @Scope("prototype")
 public class ScheduledTransactionJob extends QuartzJobBean {
 
-    @Autowired
-    private TransactionsService transactionsService;
+    private final TransactionsService transactionsService;
 
-    @Autowired
-    private ScheduledTransactionRepository repository;
+    private final ScheduledTransactionRepository repository;
 
-    @Autowired
-    private Timestamper timestamper;
+    private final Timestamper timestamper;
 
-    @Autowired
-    private CompositeMeterRegistry meterRegistry;
+    private final Counter executionsCounter;
 
     private ScheduledTransaction scheduledTransaction;
+
+    @Autowired
+    public ScheduledTransactionJob(
+        TransactionsService transactionsService, ScheduledTransactionRepository repository,
+        Timestamper timestamper, MeterRegistry meterRegistry) {
+        this.transactionsService = transactionsService;
+        this.repository = repository;
+        this.timestamper = timestamper;
+
+        executionsCounter = meterRegistry.counter("scheduled_transaction_execution");
+    }
 
     public void setScheduledTransaction(ScheduledTransaction scheduledTransaction) {
         this.scheduledTransaction = scheduledTransaction;
@@ -47,7 +54,7 @@ public class ScheduledTransactionJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         log.debug("Executing enabled transaction for {}", scheduledTransaction);
-        meterRegistry.counter("scheduled_transaction_execution").increment();
+        executionsCounter.increment();
 
         final PreAuthenticatedAuthenticationToken auth = new PreAuthenticatedAuthenticationToken(
                 scheduledTransaction.getParentId(),

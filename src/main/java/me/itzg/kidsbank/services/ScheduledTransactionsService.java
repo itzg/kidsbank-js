@@ -1,5 +1,11 @@
 package me.itzg.kidsbank.services;
 
+import static org.quartz.CronScheduleBuilder.atHourAndMinuteOnGivenDaysOfWeek;
+import static org.quartz.CronScheduleBuilder.monthlyOnDayAndHourAndMinute;
+
+import java.util.List;
+import java.util.Random;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.config.ScheduledTransactionProperties;
 import me.itzg.kidsbank.repositories.ScheduledTransactionRepository;
@@ -16,13 +22,6 @@ import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Random;
-
-import static org.quartz.CronScheduleBuilder.atHourAndMinuteOnGivenDaysOfWeek;
-import static org.quartz.CronScheduleBuilder.monthlyOnDayAndHourAndMinute;
 
 /**
  * @author Geoff Bourne
@@ -116,6 +115,9 @@ public class ScheduledTransactionsService {
     }
 
     private ScheduleBuilder<?> buildSchedule(ScheduledTransaction scheduledTransaction) {
+        // For debugging
+//        return CronScheduleBuilder.cronSchedule("0 * * * * ?");
+
         switch (scheduledTransaction.getIntervalType()) {
             case WEEKLY:
                 return atHourAndMinuteOnGivenDaysOfWeek(chooseHour(),
