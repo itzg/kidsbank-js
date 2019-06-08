@@ -26,6 +26,9 @@
     "semantic-ui-css": "^2.2.14",
     "semantic-ui-react": "^0.83.0"
   },
+  "resolutions": {
+    "querystringify": "~2.0.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
