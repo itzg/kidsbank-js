@@ -14,11 +14,6 @@ jobs:
   test_and_package:
     <<: *defaults
 
-    parameters:
-      mainline-build:
-        type: boolean
-        default: false
-
     steps:
       - checkout
 
@@ -45,22 +40,11 @@ jobs:
             - src/main/app/node_modules
           key: yarn-dependencies-{{ checksum "src/main/app/yarn.lock" }}
 
-      # includes package goal
-      - when:
-          condition: <<mainline-build>>
-          steps:
-            - run: >
-                mvn
-                -s settings.xml
-                integration-test
-                jib:build
-      - unless:
-          condition: <<mainline-build>>
-          steps:
-            - run: >
-                mvn
-                -s settings.xml
-                verify
+      - run: >
+          mvn
+          -s settings.xml
+          integration-test
+          jib:build
 
       - run: |
           mkdir -p /tmp/jars
@@ -101,4 +85,3 @@ workflows:
           filters:
             branches:
               only: master
-          mainline-build: true
