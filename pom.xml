@@ -21,6 +21,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
+        <image.prefix>itzg</image.prefix>
+        <image.name>kidsbank-js</image.name>
     </properties>
 
     <scm>
@@ -246,11 +248,15 @@
                 </executions>
                 <configuration>
                     <to>
-                        <image>itzg/kidsbank-js</image>
+                        <image>${image.prefix}/${image.name}</image>
                         <tags>
                             <tag>latest</tag>
                             <tag>${project.version}</tag>
                         </tags>
+                        <auth>
+                            <username>${env.DOCKER_USER}</username>
+                            <password>${env.DOCKER_PASSWORD}</password>
+                        </auth>
                     </to>
                     <from>
                         <image>adoptopenjdk:11-jdk-hotspot</image>
