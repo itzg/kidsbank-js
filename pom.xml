@@ -13,14 +13,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.2.RELEASE</version>
+        <version>2.1.8.RELEASE</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
     </properties>
 
     <scm>
@@ -143,6 +143,7 @@
     </repositories>
 
     <build>
+        <finalName>${artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -234,7 +235,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>0.10.1</version>
+                <version>1.6.1</version>
                 <executions>
                     <execution>
                         <phase>deploy</phase>
@@ -252,7 +253,7 @@
                         </tags>
                     </to>
                     <from>
-                        <image>openjdk:8u181-jre-alpine</image>
+                        <image>adoptopenjdk:11-jdk-hotspot</image>
                     </from>
                 </configuration>
             </plugin>
