@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ParentOAuth2DetailsLoader implements OAuth2DetailsLoader {
 
+    public static final String LOCAL_PROVIDER = "local";
     private final MongoTemplate mongoTemplate;
     private final ParentRepository parentRepository;
     private final Counter created;
@@ -86,7 +87,7 @@ public class ParentOAuth2DetailsLoader implements OAuth2DetailsLoader {
         }
         else {
             final Optional<Parent> parent = parentRepository.findBySocialConnectionsContains(
-                new SocialConnection("local", principal.getName()));
+                new SocialConnection(LOCAL_PROVIDER, principal.getName()));
 
             return parent.map(Parent::getId).orElse(null);
         }

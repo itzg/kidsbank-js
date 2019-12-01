@@ -55,7 +55,7 @@ public class ParentApi {
             final OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) principal;
             provider = token.getAuthorizedClientRegistrationId();
         } else {
-            provider = "local";
+            provider = ParentOAuth2DetailsLoader.LOCAL_PROVIDER;
         }
         return (ParentUserDetails) detailsLoader.loadUserDetails(provider, principal.getName());
     }

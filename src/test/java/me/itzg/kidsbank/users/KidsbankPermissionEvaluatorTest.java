@@ -6,9 +6,11 @@ import static org.junit.Assert.assertTrue;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.Collections;
+import java.util.List;
 import me.itzg.kidsbank.types.Account;
 import me.itzg.kidsbank.types.Parent;
 import me.itzg.kidsbank.types.Permissions;
+import me.itzg.kidsbank.types.SocialConnection;
 import me.itzg.kidsbank.types.Types;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @DataMongoTest
 public class KidsbankPermissionEvaluatorTest {
 
+    private static final String PARENT_USERNAME = "parent-1";
     private Account account;
     private Parent parent;
     @Autowired
@@ -51,19 +54,23 @@ public class KidsbankPermissionEvaluatorTest {
 
     @Before
     public void setUp() {
+        mongoTemplate.dropCollection(Account.class);
         account = new Account();
         account.setName("child1");
         mongoTemplate.save(account);
 
-        parent = new Parent();
-        parent.setAccounts(Collections.singletonList(account.getId()));
+        mongoTemplate.dropCollection(Parent.class);
+        parent = new Parent()
+            .setAccounts(Collections.singletonList(account.getId()))
+            .setSocialConnections(List.of(
+                new SocialConnection(ParentOAuth2DetailsLoader.LOCAL_PROVIDER, PARENT_USERNAME)));
         mongoTemplate.save(parent);
     }
 
     @Test
     public void testParentCanShare() {
         final TestingAuthenticationToken auth = new TestingAuthenticationToken(
-                parent.getId(),
+                PARENT_USERNAME,
                 "",
                 Collections.singletonList(Authorities.PARENT_AUTHORITY));
         final boolean result = permissionEvaluator.hasPermission(auth,
