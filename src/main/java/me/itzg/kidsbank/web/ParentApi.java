@@ -8,9 +8,11 @@ import me.itzg.kidsbank.services.AccountsService;
 import me.itzg.kidsbank.services.TransactionsService;
 import me.itzg.kidsbank.types.Account;
 import me.itzg.kidsbank.types.AccountCreation;
+import me.itzg.kidsbank.types.ParentUserDetails;
 import me.itzg.kidsbank.types.ResponseValue;
 import me.itzg.kidsbank.users.ParentOAuth2DetailsLoader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +41,23 @@ public class ParentApi {
         this.accountsService = accountsService;
         this.transactionsService = transactionsService;
         this.detailsLoader = detailsLoader;
+    }
+
+    /**
+     * This method is primarily used for registering impersonated parent users during integration
+     * testing.
+     * @return a user details object
+     */
+    @PostMapping("register")
+    public ParentUserDetails register(Principal principal) {
+        final String provider;
+        if (principal instanceof OAuth2AuthenticationToken) {
+            final OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) principal;
+            provider = token.getAuthorizedClientRegistrationId();
+        } else {
+            provider = "local";
+        }
+        return (ParentUserDetails) detailsLoader.loadUserDetails(provider, principal.getName());
     }
 
     @PostMapping("accounts")

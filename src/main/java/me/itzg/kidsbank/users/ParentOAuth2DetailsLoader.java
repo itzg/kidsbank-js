@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.security.Principal;
 import java.util.Collections;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import me.itzg.kidsbank.repositories.ParentRepository;
 import me.itzg.kidsbank.types.Parent;
@@ -84,7 +85,10 @@ public class ParentOAuth2DetailsLoader implements OAuth2DetailsLoader {
             return ((ParentUserDetails) ((OAuth2AuthenticationToken) principal).getDetails()).getId();
         }
         else {
-            return principal.getName();
+            final Optional<Parent> parent = parentRepository.findBySocialConnectionsContains(
+                new SocialConnection("local", principal.getName()));
+
+            return parent.map(Parent::getId).orElse(null);
         }
     }
 }
