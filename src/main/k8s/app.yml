@@ -6,18 +6,18 @@ metadata:
   labels:
     app: kidsbank-app
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       name: kidsbank-app
       labels:
         app: kidsbank-app
       annotations:
-        deployed: "2019-01-31T09:00"
+        revision: "1"
     spec:
       containers:
         - name: kidsbank-app
-          image: itzg/kidsbank-js:0.5-SNAPSHOT
+          image: itzg/kidsbank-js:0.4.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

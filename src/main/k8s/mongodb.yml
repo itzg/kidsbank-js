@@ -18,7 +18,7 @@ spec:
         app: kidsbank-mongo
     spec:
       containers:
-        - image: mongo:3.6.10
+        - image: mongo:3.6.16
           name: mongo
           ports:
             - containerPort: 27017
@@ -33,7 +33,7 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 4Gi
+            storage: 2Gi
 ---
 apiVersion: v1
 kind: Service
