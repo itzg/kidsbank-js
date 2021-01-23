@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "http-proxy-middleware": "^0.19.1",
-    "react-scripts": "^2.1.8"
+    "react-scripts": "^4.0.1"
   },
   "dependencies": {
     "history": "^4.7.2",
