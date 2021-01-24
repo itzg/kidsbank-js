@@ -17,13 +17,20 @@ spec:
     spec:
       containers:
         - name: kidsbank-app
-          image: itzg/kidsbank-js:0.4.0
+          image: itzg/kidsbank-js:0.4.1
           imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 500Mi
+              cpu: 100m
           ports:
             - containerPort: 8080
           env:
             - name: JAVA_TOOL_OPTIONS
-              value: "-Xmx1024m -Xms512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+             # -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+              value: > 
+                -Xmx1024m 
+                -Xms512m 
             - name: SPRING_PROFILES_ACTIVE
               value: oauth2
             - name: SERVER_USE_FORWARD_HEADERS
