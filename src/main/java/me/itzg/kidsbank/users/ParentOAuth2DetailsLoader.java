@@ -15,6 +15,7 @@ import me.itzg.kidsbank.types.SocialConnection;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 /**
@@ -84,8 +85,9 @@ public class ParentOAuth2DetailsLoader implements OAuth2DetailsLoader {
     public String extractParentId(Principal principal) {
         if (principal instanceof OAuth2AuthenticationToken) {
             return ((ParentUserDetails) ((OAuth2AuthenticationToken) principal).getDetails()).getId();
-        }
-        else {
+        } else if (principal instanceof PreAuthenticatedAuthenticationToken) {
+            return principal.getName();
+        } else {
             final Optional<Parent> parent = parentRepository.findBySocialConnectionsContains(
                 new SocialConnection(LOCAL_PROVIDER, principal.getName()));
 
