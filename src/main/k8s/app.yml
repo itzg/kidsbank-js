@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: kidsbank-app
-          image: itzg/kidsbank-js:0.4.1
+          image: itzg/kidsbank-js:0.4.2
           imagePullPolicy: Always
           resources:
             limits:
