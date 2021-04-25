@@ -13,7 +13,7 @@ logging:
     service: kidsbank
   level:
     org.springframework.web.servlet.DispatcherServlet: info
-    me.itzg.kidsbank: ${kidsbank.log-level:-info}
+    me.itzg.kidsbank: ${kidsbank.log-level:info}
 management:
   metrics:
     export:
