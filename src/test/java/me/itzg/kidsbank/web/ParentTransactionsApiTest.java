@@ -80,7 +80,7 @@ public class ParentTransactionsApiTest {
                                              .toString())
         )
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is("t-1")))
         ;
 
