@@ -1,7 +1,11 @@
 package me.itzg.kidsbank.web;
 
+import java.util.Collections;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
+import org.springframework.boot.web.error.ErrorAttributeOptions.Include;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
@@ -12,9 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * This was introduced to intercept uncaught errors and redirect to the top level page.
@@ -30,7 +31,7 @@ import java.util.Map;
 public class SimpleErrorController implements ErrorController {
     private static final String[] attributesToFlash = new String[]{"status, error, path"};
 
-    private ErrorAttributes errorAttributes;
+    private final ErrorAttributes errorAttributes;
 
     @Autowired
     public SimpleErrorController(ErrorAttributes errorAttributes) {
@@ -40,7 +41,9 @@ public class SimpleErrorController implements ErrorController {
     @RequestMapping("/error")
     public ResponseEntity<Object> handleError(WebRequest request, RedirectAttributes redirectAttributes,
                                               UriComponentsBuilder uriBuilder) {
-        final Map<String, Object> errorAttributes = this.errorAttributes.getErrorAttributes(request, true);
+        final Map<String, Object> errorAttributes = this.errorAttributes.getErrorAttributes(request,
+            ErrorAttributeOptions.of(Include.EXCEPTION)
+            );
         log.warn("Intercepted web controller error: request={}, error={}", request, errorAttributes);
 
         for (String name : attributesToFlash) {
@@ -67,10 +70,5 @@ public class SimpleErrorController implements ErrorController {
                                     errorAttributes.get("message"))
                         .build(Collections.emptyMap()))
                 .build();
-    }
-
-    @Override
-    public String getErrorPath() {
-        return "/error";
     }
 }

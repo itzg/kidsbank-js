@@ -68,7 +68,7 @@ public class TransactionsService {
         final long total = mongoTemplate.count(baseQuery, Transaction.class);
 
         final List<Transaction> results = mongoTemplate.find(baseQuery
-                                                                     .with(new Sort(Sort.Direction.DESC,
+                                                                     .with(Sort.by(Sort.Direction.DESC,
                                                                                     Transaction.FIELD_WHEN))
                                                                      .with(pageable), Transaction.class);
 

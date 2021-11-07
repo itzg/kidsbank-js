@@ -9,6 +9,8 @@ services:
       - 27017:27017
   mongoexpress:
     image: mongo-express
+    depends_on:
+      - mongo
     ports:
       - 8081:8081
 volumes:
