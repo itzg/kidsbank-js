@@ -38,7 +38,7 @@ jobs:
       - save_cache:
           paths:
             - src/main/app/node_modules
-          key: yarn-dependencies-{{ checksum "src/main/app/yarn.lock" }}
+          key: npm-dependencies-{{ checksum "src/main/app/package-lock.json" }}
 
       - run: >
           mvn
