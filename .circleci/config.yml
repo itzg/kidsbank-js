@@ -25,9 +25,9 @@ jobs:
           - mvn-dependencies-
       - restore_cache:
           keys:
-          - yarn-dependencies-{{ checksum "src/main/app/yarn.lock" }}
+          - npm-dependencies-{{ checksum "src/main/app/package-lock.json" }}
           # fallback to using the latest cache if no exact match is found
-          - yarn-dependencies-
+          - npm-dependencies-
 
       - run: mvn dependency:go-offline generate-resources
 
