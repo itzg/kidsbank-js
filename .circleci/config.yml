@@ -42,9 +42,7 @@ jobs:
 
       - run: >
           mvn
-          -s settings.xml
-          integration-test
-          jib:build
+          spring-boot:build-image -Dspring-boot.build-image.publish=true
 
       - run: |
           mkdir -p /tmp/jars

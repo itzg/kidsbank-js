@@ -152,6 +152,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <image>
+                        <name>itzg/kidsbank-js:${project.version}</name>
+                    </image>
+                    <docker>
+                        <publishRegistry>
+                            <username>${env.DOCKER_USER}</username>
+                            <password>${env.DOCKER_PASSWORD}</password>
+                        </publishRegistry>
+                    </docker>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -241,36 +252,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.1.4</version>
-                <executions>
-                    <execution>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <to>
-                        <image>${image.prefix}/${image.name}</image>
-                        <tags>
-                            <tag>latest</tag>
-                            <tag>${project.version}</tag>
-                        </tags>
-                        <auth>
-                            <username>${env.DOCKER_USER}</username>
-                            <password>${env.DOCKER_PASSWORD}</password>
-                        </auth>
-                    </to>
-                    <from>
-                        <image>adoptopenjdk:11-jre-hotspot</image>
-                    </from>
-                </configuration>
             </plugin>
         </plugins>
 
