@@ -2,15 +2,11 @@ spring:
   data:
     mongodb:
       database: kidsbank
-      host: ${mongodbHost:localhost}
   mvc:
     contentnegotiation:
       media-types:
         xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 logging:
-  gelf:
-    protocol: TCP
-    service: kidsbank
   level:
     org.springframework.web.servlet.DispatcherServlet: info
     me.itzg.kidsbank: ${kidsbank.log-level:info}
