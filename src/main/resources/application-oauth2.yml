@@ -2,7 +2,6 @@ spring:
   security:
     oauth2:
       client:
-        provider:
         registration:
           facebook:
             client-id: ${facebook-client-id}
