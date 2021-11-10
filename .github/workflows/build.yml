@@ -38,6 +38,11 @@ jobs:
         # list of Docker images to use as base name for tags
         images: |
           itzg/kidsbank-js
+        tags: |
+          type=ref,event=branch
+          type=ref,event=tag
+          type=ref,event=pr
+          type=edge
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
