@@ -1,0 +1,27 @@
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Version to release
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          cache: maven
+
+      - name: Prepare release
+        run: |
+          git config --local user.name "Github Actions"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ./mvnw -B release:prepare -DreleaseVersion=${{ github.event.inputs.release }}
