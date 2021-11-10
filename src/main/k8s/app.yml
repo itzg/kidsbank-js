@@ -15,22 +15,28 @@ spec:
       annotations:
         revision: "1"
     spec:
+      securityContext:
+        runAsUser: 1000
       containers:
         - name: kidsbank-app
-          image: itzg/kidsbank-js:0.4.2
+          image: itzg/kidsbank-js:0.5.2
+          # image: itzg/kidsbank-js:0.6-SNAPSHOT
+          #image: itzg/kidsbank-js:0.4.2
           imagePullPolicy: Always
           resources:
             limits:
-              memory: 500Mi
-              cpu: 100m
+              memory: 1000Mi
+              cpu: 500m
           ports:
             - containerPort: 8080
           env:
-            - name: JAVA_TOOL_OPTIONS
              # -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
-              value: > 
-                -Xmx1024m 
-                -Xms512m 
+             #-XX:+FlightRecorder -XX:StartFlightRecording=duration=400s,filename=/tmp/startup.jfr
+            - name: JAVA_TOOL_OPTIONS
+              value: >
+                -XX:MaxRAMPercentage=75
+            - name: KIDSBANK_LOGLEVEL
+              value: debug
             - name: SPRING_PROFILES_ACTIVE
               value: oauth2
             - name: SERVER_USE_FORWARD_HEADERS
@@ -57,16 +63,6 @@ spec:
                 secretKeyRef:
                   key: client-secret
                   name: kidsbank-social-github
-            - name: LINKED_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  key: client-id
-                  name: kidsbank-social-linkedin
-            - name: LINKED_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: client-secret
-                  name: kidsbank-social-linkedin
       restartPolicy: Always
   selector:
     matchLabels:
