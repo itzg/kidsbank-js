@@ -3,19 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "http-proxy-middleware": "^0.19.1",
-    "react-scripts": "^4.0.1"
+    "http-proxy-middleware": "^2.0.6",
+    "react-scripts": "^4.0.3"
   },
   "dependencies": {
     "history": "^4.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "prop-types": "^15.6.0",
+    "prop-types": "^15.8.1",
     "react": "^16.2.0",
-    "react-copy-to-clipboard": "^5.0.1",
+    "react-copy-to-clipboard": "^5.1.0",
     "react-datepicker": "^0.64.0",
     "react-dom": "^16.2.0",
-    "react-notification-system": "^0.2.16",
+    "react-notification-system": "^0.4.0",
     "react-redux": "^4.4.9",
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2",
@@ -24,14 +24,14 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "semantic-ui-css": "^2.2.14",
-    "semantic-ui-react": "^0.83.0"
+    "semantic-ui-react": "^0.88.2"
   },
   "resolutions": {
     "querystringify": "~2.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
