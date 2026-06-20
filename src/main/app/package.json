@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "http-proxy-middleware": "^2.0.6",
+    "http-proxy-middleware": "^3.0.7",
     "react-scripts": "^4.0.3"
   },
   "dependencies": {
